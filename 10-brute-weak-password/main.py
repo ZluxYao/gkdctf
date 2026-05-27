@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import os
 import pathlib
 import re
 import sys
@@ -16,7 +17,8 @@ from typing import Iterable, Optional, Tuple
 
 import requests
 
-DEFAULT_URL = "http://47.120.76.57:33855/"
+os.environ["NO_PROXY"] = "*"
+DEFAULT_URL = "http://47.120.47.61:32987/"
 DEFAULT_USERS = ["admin", "root", "test", "user", "ctf", "guest"]
 FAIL_MARK = "用户名或密码错误"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")
