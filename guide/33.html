@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Q33 学生解题指引</title>
+  <style>
+    body { margin: 0; font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; line-height: 1.75; color: #17212b; background: #f5f7fb; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 64px; }
+    article { background: #fff; border: 1px solid #d9e2ec; border-radius: 12px; padding: 28px; }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 28px; padding-top: 18px; border-top: 1px solid #d9e2ec; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #0f172a; color: #e5eefc; padding: 14px; border-radius: 8px; }
+    .note { background: #ecfdf5; border-left: 4px solid #0f766e; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+<main>
+<article>
+  <h1>Q33 学生解题指引</h1>
+  <p class="note">这份指引面向初学者，只说明观察方法、推理链路和关键知识点；具体 payload、真实 flag/token 和敏感路径已用占位表达处理。</p>
+  <h2>题目概览</h2>
+  <p>先根据题目材料识别入口、认证状态、可控参数和预期保护目标，再通过本地靶机响应验证题型。</p>
+  <h2>学习目标</h2>
+  <ul>
+    <li>先做黑盒基线观察，不直接跳到答案。</li>
+    <li>把每个请求的观察结果转化为下一步假设。</li>
+    <li>用题面、源码提示或参考答案确认漏洞成因。</li>
+    <li>理解修复方向，而不是只记一次性答案。</li>
+  </ul>
+  
+  <h2>题面线索解读</h2>
+  <p>本节根据原始题面归纳辅助指引，不展示题面原文。教师可用它引导学生把题面信息转化为可验证的观察步骤。</p>
+  <h3>线索转化</h3>
+  <ul>
+    <li>题面强调验证码时，先判断验证码是否绑定服务端 session、是否一次性失效，以及是否存在前端校验或弱字符集。</li>
+    <li>题面出现 token/JWT 时，先区分 token 的用途：身份声明、一次性登录令牌、CSRF token 或接口访问凭证。</li>
+    <li>题面涉及文件包含或 PHP wrapper 时，先确认参数是否进入 include/readfile，再区分源码读取、日志污染和 data wrapper 执行。</li>
+    <li>题面涉及命令执行时，先确认参数是否拼接到系统命令，再判断是否有回显、过滤字符和可用外带通道。</li>
+    <li>题面涉及文件读取或路径参数时，先确认根目录限制，再逐层尝试相对路径，判断是否能越过预期目录。</li>
+    <li>题面出现爆破/字典时，先确认账号、密码空间、速率限制、验证码或一次性 token 等约束。</li>
+  </ul>
+  <h3>建议观察清单</h3>
+  <ul>
+    <li>保持同一个会话访问登录页、获取验证码图片，再提交一次错误密码；如果返回密码错误而不是验证码错误，说明验证码已被服务端接受。</li>
+    <li>观察 token 的获取接口、提交位置、过期行为和错误响应，再判断能否伪造、复用、侧信道推断或同源读取。</li>
+    <li>用普通页面名做基线，再测试 wrapper、日志路径或可控请求头，观察响应是否包含源码、执行输出或错误信息。</li>
+    <li>用基线参数确认正常功能，再用安全的分隔符测试是否改变输出；无回显场景优先找日志或 OOB 记录通道。</li>
+    <li>比较正常文件、缺失文件和上级目录文件的响应差异，用错误信息缩小真实路径。</li>
+    <li>用少量错误样本确认失败响应稳定，再读取题目附件字典或构造有限搜索空间。</li>
+    <li>每一步都应能回答：当前观察支持了哪个假设，下一步要排除哪个不确定点。</li>
+  </ul>
+  <h3>核心知识点</h3>
+  <ul>
+    <li>验证码的安全性不只取决于图片难度，还取决于服务端是否正确绑定会话、请求和失败次数。</li>
+    <li>令牌类题目要关注签名算法、密钥强度、生命周期、绑定关系和响应时间等旁路信息。</li>
+    <li>文件包含题要区分 LFI、RFI、源码泄露和代码执行，修复重点是白名单和禁用危险 wrapper。</li>
+    <li>命令注入的核心是服务端把用户输入当作 shell 语法解释，修复应避免 shell 拼接并使用参数化 API。</li>
+    <li>路径穿越题的关键是规范化路径和访问控制，不能只靠前端限制文件名。</li>
+    <li>教学场景中的爆破应强调边界、授权、限速和日志，而不是无约束地扩大尝试范围。</li>
+    <li>最终 flag 只是验证闭环；教学重点是让学生理解从题面线索到黑盒观察再到验证请求的推理过程。</li>
+  </ul>
+
+  <h2>黑盒观察与推理步骤</h2>
+  <h2>Q33 direct backend</h2>
+<p>以下步骤按 direct solver 的实际执行思路记录。每一步都对应脚本中的一个关键观察或请求动作，而不是只给最终结论。</p>
+<h3>Step 1：黑盒观察题目入口</h3>
+<h4>操作</h4>
+<p>访问首页，记录表单、接口说明、可控参数、登录要求和错误提示。</p>
+<h4>预期观察</h4>
+<p>能看到本题的业务入口和一到两个正常功能响应。</p>
+<h4>简要分析</h4>
+<p>忘记密码接口把重置 token 直接返回给客户端，导致攻击者可为 admin 发起重置并接管账号。</p>
+<h4>为什么要这样做</h4>
+<p>先建立正常行为基线，后面每个异常响应才有参照。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证当前实例与题面描述的漏洞类型一致。</p>
+<h3>Step 2：建立失败或防护基线</h3>
+<h4>操作</h4>
+<p>先请求普通用户找回密码确认响应里有 token，再请求 admin 的 token，提交 reset 表单设置新密码。</p>
+<h4>预期观察</h4>
+<p>正常请求、错误请求和被拦截请求之间会出现稳定差异。</p>
+<h4>简要分析</h4>
+<p>这一步刻意不直接跳到最终结果，而是确认哪个边界缺少服务端保护。</p>
+<h4>为什么要这样做</h4>
+<p>界面上依次使用忘记密码表单、重置表单和登录表单；脚本只是在同样流程中保存 token。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证重置凭证是否泄露给不应看到它的人。</p>
+<h3>Step 3：把推断转成可执行脚本</h3>
+<h4>操作</h4>
+<p>用 Python 标准库 urllib 复现关键请求，必要时保存压缩包、cookie、multipart 文件或并发脚本到 scripts 目录。</p>
+<h4>预期观察</h4>
+<p>脚本输出 HTTP 状态、关键响应片段和是否命中 flag 模式。</p>
+<h4>简要分析</h4>
+<p>脚本把课堂上的手工观察固化成可重复验证流程，也避免 curl 在不同系统上的参数差异。</p>
+<h4>为什么要这样做</h4>
+<p>学生仍可按上一条界面路径理解操作；教师复测优先用脚本保证可重复。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证推理链是否能在干净会话中稳定复现。</p>
+<h3>Step 4：执行 Q33 的关键利用链</h3>
+<h4>操作</h4>
+<ul>
+<li>请求 admin 忘记密码并观察响应 token：HTTP 200，响应摘要 &quot;&lt;p&gt;Reset link 已生成（真实环境应由邮件发送）：&lt;/p&gt;&lt;p&gt;&lt;a href=&#x27;/reset?user=admin&amp;token=79d999cc3f4e9196917a&#x27;&gt;/reset?user=admin&amp;token=79d999cc3f4e9196917a&lt;/a&gt;&lt;/p&gt;&quot;</li>
+<li>使用泄露 token 设置 admin 新密码：HTTP 200，响应摘要 &quot;password for admin reset ok, now &lt;a href=&#x27;/&#x27;&gt;login&lt;/a&gt;&quot;</li>
+<li>使用新密码登录 admin：HTTP 200</li>
+<li>登录后访问首页确认管理员内容：HTTP 200</li>
+<li>flag 已写入 <code>work/solve/33/flag.txt</code></li>
+</ul>
+<h4>预期观察</h4>
+<p>用新密码登录 admin 后首页显示管理员内容。</p>
+<h4>简要分析</h4>
+<p>这里的每条证据都来自 direct solver 实际请求或脚本动作。</p>
+<h4>为什么要这样做</h4>
+<p>把实际证据写入步骤，避免 direct solve 只留下一个过短结论。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证最终请求是否真正触达漏洞根因，而不是依赖参考答案。</p>
+<h3>Step 5：结果确认和修复复盘</h3>
+<h4>操作</h4>
+<p>确认 <code>flag.txt</code>、<code>evidence.md</code> 和最终学生 HTML 已落盘；学生版 HTML 不直接摘录题面或暴露 payload，只保留思路。</p>
+<h4>预期观察</h4>
+<p>文件存在且 evidence 中包含完整请求链。</p>
+<h4>简要分析</h4>
+<p>教师备课需要答案证据，学生材料需要推理过程，两者分开保存。</p>
+<h4>为什么要这样做</h4>
+<p>这样可以把本题讲成方法论：观察、假设、验证、复盘。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证解题和教学输出都形成闭环。</p>
+  <h2>执行证据摘要</h2>
+  <h2>Q33 direct backend 执行证据</h2>
+<ul>
+<li>请求 admin 忘记密码并观察响应 token：HTTP 200，响应摘要 &quot;&lt;p&gt;Reset link 已生成（真实环境应由邮件发送）：&lt;/p&gt;&lt;p&gt;&lt;a href=&#x27;/reset?user=admin&amp;token=79d999cc3f4e9196917a&#x27;&gt;/reset?user=admin&amp;token=79d999cc3f4e9196917a&lt;/a&gt;&lt;/p&gt;&quot;</li>
+<li>使用泄露 token 设置 admin 新密码：HTTP 200，响应摘要 &quot;password for admin reset ok, now &lt;a href=&#x27;/&#x27;&gt;login&lt;/a&gt;&quot;</li>
+<li>使用新密码登录 admin：HTTP 200</li>
+<li>登录后访问首页确认管理员内容：HTTP 200</li>
+<li>flag 已写入 <code>work/solve/33/flag.txt</code></li>
+</ul>
+  <h2>常见误区</h2>
+  <ul>
+    <li>只复制参考答案，不先确认当前实例的接口和响应是否一致。</li>
+    <li>忽略编码、Cookie、一次性 token、bot 轮询时间等执行条件。</li>
+    <li>看到一次失败就换题型，而不是先记录响应并缩小假设。</li>
+  </ul>
+  <h2>修复建议</h2>
+  <p>按题型回到根因修复：输入白名单、服务端鉴权、CSRF token、避免 shell 拼接、关闭危险 PHP wrapper、限制文件读取范围、使用强密钥和安全会话设计。</p>
+  <h2>总结</h2>
+  <p>本题应按“基线请求 -> 异常行为观察 -> 推断规则 -> 验证假设 -> 参考材料确认”的顺序完成。最终结果只作为验证闭环，不应替代前面的推理过程。</p>
+</article>
+</main>
+</body>
+</html>

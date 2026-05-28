@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Q12 目录 / 备份文件爆破 - 学生解题指引</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f7;
+      --panel: #ffffff;
+      --panel-soft: #eef3f7;
+      --text: #17212b;
+      --muted: #546170;
+      --line: #d7dee6;
+      --accent: #1f6feb;
+      --accent-soft: #eaf2ff;
+      --warn: #8a5a00;
+      --warn-soft: #fff5db;
+      --ok: #165b33;
+      --ok-soft: #eaf7ee;
+      --code: #0f1720;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #dde9ff 0, transparent 28%),
+        radial-gradient(circle at top right, #eaf7ee 0, transparent 24%),
+        var(--bg);
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+    article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(15, 23, 32, 0.08);
+    }
+    header {
+      padding: 30px 30px 22px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 45%, #f8fafc 100%);
+      border-bottom: 1px solid var(--line);
+    }
+    h1, h2, h3 {
+      line-height: 1.28;
+      margin: 0 0 12px;
+    }
+    h1 { font-size: 2rem; }
+    h2 {
+      font-size: 1.28rem;
+      margin-top: 0;
+    }
+    h3 {
+      font-size: 1.06rem;
+      margin-top: 0;
+    }
+    p, li { font-size: 1rem; }
+    section {
+      padding: 24px 30px;
+      border-top: 1px solid var(--line);
+    }
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 52rem;
+    }
+    .meta, .summary, .note, .tip, .warn {
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .meta, .summary { background: var(--panel-soft); }
+    .note { background: var(--accent-soft); }
+    .tip { background: var(--ok-soft); }
+    .warn { background: var(--warn-soft); color: #5f4300; }
+    .meta-table, .logic-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .meta-table th, .meta-table td, .logic-table th, .logic-table td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .meta-table th, .logic-table th {
+      width: 18%;
+      background: #f8fafc;
+    }
+    ol.steps {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    ol.steps > li {
+      margin: 0 0 18px;
+      padding-left: 0.25rem;
+    }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 1.2rem;
+    }
+    pre, code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    pre {
+      margin: 12px 0 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--code);
+      color: #f8fafc;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    code.inline {
+      padding: 0.15em 0.4em;
+      border-radius: 6px;
+      background: #eef2f6;
+      color: #243040;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: #fcfdff;
+    }
+    .step-block {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: #fcfdff;
+    }
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 0.18rem 0.56rem;
+      border-radius: 999px;
+      background: #edf2f8;
+      color: #304053;
+      font-size: 0.88rem;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    @media (max-width: 700px) {
+      header, section { padding: 20px 18px; }
+      h1 { font-size: 1.65rem; }
+      .meta-table th, .logic-table th { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <header>
+        <h1>Q12 目录 / 备份文件爆破：学生解题指引</h1>
+        <p class="lead">这是一道典型的 Web 信息泄露题。首页看起来几乎没有功能，但真正的突破点不在页面交互，而在开发过程中残留在站点根目录的备份文件。本指引按“先黑盒观察、再做推理、最后用源码和已验证材料确认”的顺序展开，适合第一次接触目录/文件爆破思路的本科生。</p>
+      </header>
+
+      <section>
+        <div class="meta">
+          <h2>题目概览</h2>
+          <table class="meta-table">
+            <tr><th>题目方向</th><td>Web 安全 / 信息泄露 / 目录与备份文件探测</td></tr>
+            <tr><th>教学目标</th><td>学会从“空白首页”继续推进，识别备份包泄露，并把黑盒观察和后续源码确认连接成完整证据链。</td></tr>
+            <tr><th>已知材料</th><td>原始题目说明 <code class="inline">work/md/12.md</code>，已验证题解页面 <code class="inline">work/solve/12/12.html</code>。</td></tr>
+            <tr><th>安全边界</th><td>本文只描述授权教学/CTF 环境中的观察方法、判断依据和学习路径，不直接给出真实备份文件名、隐藏后台路径、页面中显示的 token，也不提供可直接复制的攻击字符串。</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="summary">
+          <h2>核心思路</h2>
+          <p>先把首页当作“基线样本”来观察，而不是看到 <code class="inline">Site Under Construction</code> 就停止。随后排查最常见的公开泄露点，如果这些位置都没有实质收获，就把注意力转向开发备份包、源码压缩包和编辑器临时文件。命中备份包后，先看包内文档和目录结构，再用其中暴露出的线索确认真正的敏感入口，最后访问该入口验证页面是否直接输出题目要求的结果。</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>学习目标</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>目标 1</h3>
+            <p>理解为什么“看起来没内容的首页”仍然值得继续分析。</p>
+          </div>
+          <div class="card">
+            <h3>目标 2</h3>
+            <p>掌握从常见泄露点排查到备份文件探测的基本顺序。</p>
+          </div>
+          <div class="card">
+            <h3>目标 3</h3>
+            <p>学会把 README、源码片段、页面返回结果组合成证据链，而不是只记住答案。</p>
+          </div>
+          <div class="card">
+            <h3>目标 4</h3>
+            <p>理解这类题在真实开发流程中为什么会发生，以及应该怎样修复。</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>前置知识</h2>
+        <ul>
+          <li><strong>黑盒观察</strong>：指不先看源码，只根据页面内容、状态码、返回头、文件下载行为等可见现象来判断下一步。</li>
+          <li><strong>目录/文件爆破</strong>：不是“胡乱猜路径”，而是根据常见命名习惯，把高价值候选路径按批次验证。</li>
+          <li><strong>备份文件泄露</strong>：开发者把源码包、数据库导出、编辑器临时文件或配置备份留在 Web 根目录，导致外部用户可以直接下载。</li>
+          <li><strong>状态码和响应长度</strong>：同样是返回成功页面，不同路径的内容长度、内容类型、页面结构可能完全不同，所以不能只盯着 200 或 404。</li>
+          <li><strong>README/开发文档的价值</strong>：文档有时会直接写出后台路径、测试地址、账号说明或部署提示，往往比盲扫更快暴露真正入口。</li>
+        </ul>
+        <div class="note">
+          <strong>阅读提示：</strong>本文中出现的“命中的备份压缩包”“隐藏后台路径”“页面中显示的 token”等表述，都是对真实敏感值的占位替换。学习时要关注“为什么想到去找它”，而不是记住某个具体名字。
+        </div>
+      </section>
+
+      <section>
+        <h2>黑盒观察步骤</h2>
+        <ol class="steps">
+          <li>
+            <h3>步骤 1：先把首页当作基线，不要把“建设中”误判成“没东西”</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 用浏览器访问目标首页，或者用一个最简单的 HTTP 请求脚本读取首页正文和响应头。</p>
+              <p><span class="label">预期观察</span> 页面只显示一句类似“Site Under Construction”的占位文案，没有登录框、菜单或表单。</p>
+              <p><span class="label">推理</span> 这类页面的意义不是告诉你“题目结束了”，而是给你一个基线样本。之后你扫到的新路径，只要返回内容和这个基线不同，就值得重点检查。</p>
+              <p><span class="label">知识点</span> 首页空白不等于站点空白。很多题故意把真正入口藏在未链接的路径或可下载文件里。</p>
+            </div>
+          </li>
+          <li>
+            <h3>步骤 2：先排除最显眼的泄露点，缩小搜索方向</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 优先检查一小批高频位置，例如 <code class="inline">robots.txt</code>、版本控制目录、环境配置文件、站点地图、编辑器残留文件。</p>
+              <p><span class="label">预期观察</span> 大多数路径没有实际内容返回，少数敏感文件可能是拒绝访问，但没有直接暴露源码或配置。</p>
+              <p><span class="label">推理</span> 如果最常见的 VCS 和配置泄露点都没有实质结果，说明本题更可能想考察“开发备份包残留”这条线，而不是最基础的 <code class="inline">.git</code> 或 <code class="inline">.env</code> 暴露。</p>
+              <p><span class="label">知识点</span> 先做小范围排除，可以避免一上来就在错误方向投入大量时间。</p>
+            </div>
+          </li>
+          <li>
+            <h3>步骤 3：围绕备份命名习惯做小范围探测</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 准备一个“常见备份命名类别”的候选表，重点覆盖网站名、源码包、backup、年份、压缩后缀、编辑器临时备份等模式。可以用目录扫描工具，也可以用 Python 脚本批量请求。</p>
+              <pre><code>候选类别示例（概念性）：
+站点名 + 压缩后缀
+backup / old / src + 压缩后缀
+年份 + 备份后缀
+首页脚本 + 临时备份后缀</code></pre>
+              <p><span class="label">预期观察</span> 其中某一个候选项不再返回普通 404 页面，而是表现出“像压缩包”的特征，例如状态正常、响应体积较小但非模板页、内容类型偏向压缩文件。</p>
+              <p><span class="label">推理</span> 一旦某个路径看起来像备份包，它的价值远高于继续盲扫目录，因为源码、README、配置和隐藏入口信息常常会一起被打包暴露。</p>
+              <p><span class="label">知识点</span> 目录爆破的关键不是“数量越多越好”，而是优先验证高价值命名模式。</p>
+            </div>
+          </li>
+          <li>
+            <h3>步骤 4：下载命中的备份包，先看文件清单再看内容</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 下载“命中的备份压缩包”，解压后先观察目录结构和文件名，不要一开始只盯着某一个脚本文件。</p>
+              <p><span class="label">预期观察</span> 包内至少能看到三个高价值对象：占位首页文件、开发文档（例如 README）、以及一个名称明显不像公开前台页面的后台脚本文件。</p>
+              <p><span class="label">推理</span> 到这里，题目的主线已经非常清楚：首页只是伪装，真正重要的入口信息藏在开发残留文件里。</p>
+              <p><span class="label">知识点</span> 文件名本身就是情报。一个不在导航中出现、却带有“dashboard”“admin”“secret”含义的脚本，往往值得重点验证。</p>
+            </div>
+          </li>
+          <li>
+            <h3>步骤 5：先读 README，再读源码，用文档和代码确认前面的猜测</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 先阅读包内文档，确认是否提到管理员入口、部署说明或测试路径；再打开对应后台脚本，观察它的输出逻辑。</p>
+              <p><span class="label">预期观察</span> README 会明确指出一个隐藏后台路径；后台脚本会把环境变量中的敏感值直接渲染到页面中，而且看不到额外鉴权逻辑。</p>
+              <p><span class="label">推理</span> 这一步不是“依赖源码作弊”，而是用源码和文档去验证前面黑盒阶段已经形成的假设：这个站确实把真正入口藏在一个未公开链接的后台页里，并且该页面会直接显示题目目标值。</p>
+              <p><span class="label">知识点</span> 正确顺序应当是“先观察，再假设，再确认”，而不是一开始就把源码结论当前提。</p>
+            </div>
+          </li>
+          <li>
+            <h3>步骤 6：访问隐藏后台路径，验证页面是否直接输出结果</h3>
+            <div class="step-block">
+              <p><span class="label">操作</span> 按文档中给出的隐藏后台路径访问页面，观察是否直接显示题目要求的结果文本。</p>
+              <p><span class="label">预期观察</span> 页面会出现管理员后台或调试面板风格的内容，并在页面可见区域显示目标 token/flag。</p>
+              <p><span class="label">推理</span> 这里的成功不是“猜中路径”，而是依赖完整证据链进行定点验证：前面命中备份包，包内文档指向后台，后台脚本说明它会输出结果，最后页面表现与这些证据完全一致。</p>
+              <p><span class="label">知识点</span> 对学习者来说，最重要的是能说清楚“为什么访问这个路径”，而不是只会复述“最终页面在哪”。</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>推理链路</h2>
+        <table class="logic-table">
+          <tr>
+            <th>观察</th>
+            <th>说明了什么</th>
+            <th>下一步为什么合理</th>
+          </tr>
+          <tr>
+            <td>首页只有占位文案</td>
+            <td>前台没有直接暴露功能点，但不能证明站点没有其他资源</td>
+            <td>先把首页作为基线，再找“与基线不同”的路径</td>
+          </tr>
+          <tr>
+            <td>常见 VCS/配置泄露点没有实质命中</td>
+            <td>题目重点不太像最基础的 <code class="inline">.git</code> / <code class="inline">.env</code> 暴露</td>
+            <td>转向更符合题意的“备份文件残留”方向</td>
+          </tr>
+          <tr>
+            <td>某个候选路径像压缩包而不是普通网页</td>
+            <td>网站根目录可能存在可直接下载的站点备份</td>
+            <td>下载并解压，比继续盲扫更高效</td>
+          </tr>
+          <tr>
+            <td>备份包内出现 README 和隐藏后台脚本</td>
+            <td>开发过程信息已泄露，真正入口已不再需要盲猜</td>
+            <td>先文档确认，再源码确认，最后定点访问</td>
+          </tr>
+          <tr>
+            <td>后台脚本直接把环境变量中的结果写到页面</td>
+            <td>该页面本身就是最终验证点，且无有效访问控制</td>
+            <td>访问隐藏后台页面并读取页面显示内容</td>
+          </tr>
+        </table>
+      </section>
+
+      <section>
+        <h2>源码 / 参考答案确认</h2>
+        <p>到这一步，黑盒推理已经形成闭环。接下来再回看已验证材料和包内内容，可以把关键事实逐条确认：</p>
+        <ul>
+          <li>已验证题解说明：首页确实只是占位页，不是最终目标页面。</li>
+          <li>备份包中确实存在 README 之类的开发文档，并且文档明确点出了一个隐藏后台入口。</li>
+          <li>后台脚本的逻辑不是“校验后再显示结果”，而是直接把环境变量中的值渲染到 HTML 页面中。</li>
+          <li>因此，本题的核心漏洞不是复杂代码执行，而是“备份包泄露 + 隐藏后台未鉴权 + 页面直接输出敏感值”的组合。</li>
+        </ul>
+        <div class="warn">
+          <strong>注意：</strong>这里的“确认”是为了验证前面的推理，不是替代前面的推理。如果一开始就跳到参考答案或源码，你会知道答案，却学不会为什么要从备份文件这一方向入手。
+        </div>
+      </section>
+
+      <section>
+        <h2>常见误区</h2>
+        <ul>
+          <li>看到首页没内容就结束。正确做法是把它当作基线，而不是结论。</li>
+          <li>只扫目录，不扫备份后缀。很多高价值文件并不是目录，而是压缩包、备份文件或临时文件。</li>
+          <li>只看状态码，不看响应长度和内容类型。有些站会把 404 页面统一包装成看似正常的响应。</li>
+          <li>解压后只盯源码，不看 README。文档往往比代码更直接地暴露部署细节和隐藏路径。</li>
+          <li>把“知道后台路径”误当作“系统安全”。真正问题是后台没有鉴权，且页面直接输出敏感值。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>修复建议</h2>
+        <ul>
+          <li>上线前清理 Web 根目录，禁止保留源码压缩包、数据库导出、编辑器备份和临时文件。</li>
+          <li>把压缩包、备份后缀、版本控制目录和环境文件加入发布检查清单与忽略规则。</li>
+          <li>在服务器层面拒绝访问常见敏感扩展名和版本控制目录，即使误传也不要允许直接下载。</li>
+          <li>后台页面必须放在身份验证之后，不能把“路径足够隐蔽”当作防护手段。</li>
+          <li>在上线流程和 CI 自查中加入目录/备份文件扫描，尽量在正式发布前发现残留文件。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>总结</h2>
+        <p>这道题最想训练的，不是某个具体工具的命令，而是一个稳定的观察顺序：先确认首页基线，再排除常见泄露点，随后围绕高价值备份命名做小范围探测；命中备份包后，先用文档和目录结构建立假设，再用源码和已验证材料确认，最后定点访问隐藏后台页面。</p>
+        <p>如果你能完整复述这条链路，就说明你掌握的不是“某个题目的答案”，而是以后遇到类似“看起来什么都没有”的站点时，仍然知道该如何继续分析。</p>
+      </section>
+
+      <section>
+        <p class="footer">说明：本页面故意省略了真实备份文件名、真实后台路径和最终 token/flag，仅保留教学所需的推理框架、观察方法和判断依据，符合本科课程授权靶场的教学边界。</p>
+      </section>
+    </article>
+  </main>
+</body>
+</html>
