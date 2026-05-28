@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Q11 学生解题指引</title>
+  <style>
+    body { margin: 0; font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; line-height: 1.75; color: #17212b; background: #f5f7fb; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 64px; }
+    article { background: #fff; border: 1px solid #d9e2ec; border-radius: 12px; padding: 28px; }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 28px; padding-top: 18px; border-top: 1px solid #d9e2ec; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #0f172a; color: #e5eefc; padding: 14px; border-radius: 8px; }
+    .note { background: #ecfdf5; border-left: 4px solid #0f766e; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+<main>
+<article>
+  <h1>Q11 学生解题指引</h1>
+  <p class="note">这份指引面向初学者，只说明观察方法、推理链路和关键知识点；具体 payload、真实 flag/token 和敏感路径已用占位表达处理。</p>
+  <h2>题目概览</h2>
+  <p>先根据题目材料识别入口、认证状态、可控参数和预期保护目标，再通过本地靶机响应验证题型。</p>
+  <h2>学习目标</h2>
+  <ul>
+    <li>先做黑盒基线观察，不直接跳到答案。</li>
+    <li>把每个请求的观察结果转化为下一步假设。</li>
+    <li>用题面、源码提示或参考答案确认漏洞成因。</li>
+    <li>理解修复方向，而不是只记一次性答案。</li>
+  </ul>
+  
+  <h2>题面线索解读</h2>
+  <p>本节根据原始题面归纳辅助指引，不展示题面原文。教师可用它引导学生把题面信息转化为可验证的观察步骤。</p>
+  <h3>线索转化</h3>
+  <ul>
+    <li>题面强调验证码时，先判断验证码是否绑定服务端 session、是否一次性失效，以及是否存在前端校验或弱字符集。</li>
+    <li>题面出现爆破/字典时，先确认账号、密码空间、速率限制、验证码或一次性 token 等约束。</li>
+  </ul>
+  <h3>建议观察清单</h3>
+  <ul>
+    <li>保持同一个会话访问登录页、获取验证码图片，再提交一次错误密码；如果返回密码错误而不是验证码错误，说明验证码已被服务端接受。</li>
+    <li>用少量错误样本确认失败响应稳定，再读取题目附件字典或构造有限搜索空间。</li>
+    <li>每一步都应能回答：当前观察支持了哪个假设，下一步要排除哪个不确定点。</li>
+  </ul>
+  <h3>核心知识点</h3>
+  <ul>
+    <li>验证码的安全性不只取决于图片难度，还取决于服务端是否正确绑定会话、请求和失败次数。</li>
+    <li>教学场景中的爆破应强调边界、授权、限速和日志，而不是无约束地扩大尝试范围。</li>
+    <li>最终 flag 只是验证闭环；教学重点是让学生理解从题面线索到黑盒观察再到验证请求的推理过程。</li>
+  </ul>
+
+  <h2>黑盒观察与推理步骤</h2>
+  <h2>Q11 direct backend</h2>
+<p>以下步骤按 direct solver 的实际执行思路记录。每一步都对应脚本中的一个关键观察或请求动作，而不是只给最终结论。</p>
+<h3>Step 1：黑盒观察登录入口和表单字段</h3>
+<h4>操作</h4>
+<p>访问 <code>/login.html</code>，确认登录表单的提交地址、用户名字段、密码字段、验证码字段和验证码图片地址。</p>
+<h4>预期观察</h4>
+<p>页面返回登录表单，字段为 <code>name</code>、<code>pwd</code>、<code>yzm</code>，验证码图片由 <code>yanzhengma.php</code> 生成。</p>
+<h4>简要分析</h4>
+<p>这一步先确认真实请求格式，避免只按题面猜测参数名。</p>
+<h4>为什么要这样做</h4>
+<p>验证码题的爆破必须保持同一个 PHP session，否则识别出的验证码和提交请求不属于同一次会话。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证当前容器确实是 Q11 的验证码登录场景，并确定后续脚本请求所需字段。</p>
+<h3>Step 2：建立会话并获取验证码图片</h3>
+<h4>操作</h4>
+<p>用 Python <code>CookieJar</code> 访问登录页，再在同一 opener 中请求 <code>yanzhengma.php</code> 保存验证码图片字节。</p>
+<h4>预期观察</h4>
+<p>服务端返回 PNG 验证码，同时 CookieJar 中保留 <code>PHPSESSID</code>。</p>
+<h4>简要分析</h4>
+<p>验证码通常绑定 session；先建会话再取图，后续 POST 才能复用这次验证码。</p>
+<h4>为什么要这样做</h4>
+<p>如果重新开会话或丢 Cookie，验证码识别正确也会被服务端判错。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证验证码和登录请求是否依赖同一个 session。</p>
+<h3>Step 3：OCR 识别验证码并验证可复用</h3>
+<h4>操作</h4>
+<p>调用 <code>ddddocr</code> 识别 4 位数字验证码，并用一次错误密码请求确认验证码不会立即失效。</p>
+<h4>预期观察</h4>
+<p>错误密码时返回“用户名或密码错误”，而不是“验证码不正确”。</p>
+<h4>简要分析</h4>
+<p>这说明 OCR 结果被服务端接受，且当前实现允许在同一 session 中复用该验证码继续尝试密码。</p>
+<h4>为什么要这样做</h4>
+<p>只有确认验证码通过后，爆破失败响应才代表密码错误；否则会把验证码错误误判为密码错误。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证题目核心假设：验证码保护退化，不能有效阻止自动化尝试。</p>
+<h3>Step 4：按题目附件字典枚举账号和密码</h3>
+<h4>操作</h4>
+<p>读取平台提供的 <code>password2.txt</code>，先尝试题面常见账号，再扩展到实际后台用户名候选，循环 POST <code>login.php</code>。</p>
+<h4>预期观察</h4>
+<p>大多数请求返回“用户名或密码错误”；命中时响应中直接出现 flag 弹窗。</p>
+<h4>简要分析</h4>
+<p>direct solver 不靠人工观察页面，而是用响应文本中的 flag 模式作为命中条件。</p>
+<h4>为什么要这样做</h4>
+<p>教学上要让学生看到：爆破不是盲目发包，而是先固定验证码、固定 session，再对变量进行有边界枚举。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证字典中是否存在正确口令，以及实际有效用户名是否与题面简写一致。</p>
+<h3>Step 5：记录结果并生成教学材料</h3>
+<h4>操作</h4>
+<p>将命中结果写入 <code>flag.txt</code>，把请求证据写入 <code>evidence.md</code>，再生成学生指引 HTML。</p>
+<h4>预期观察</h4>
+<p><code>work/solve/11/flag.txt</code> 存在，<code>work/guide/11.html</code> 是完整 HTML，最终指引中不直接暴露真实 flag。</p>
+<h4>简要分析</h4>
+<p>结果文件用于教师备课复核，学生指引则强调观察、推理和验证链路。</p>
+<h4>为什么要这样做</h4>
+<p>把复现证据和教学材料分开，既方便教师确认，也避免学生只复制答案。</p>
+<h4>当前步骤验证什么假设</h4>
+<p>验证完整流程是否闭环：解题、记录、总结都成功落盘。</p>
+  <h2>执行证据摘要</h2>
+  <h2>Q11 direct backend 执行证据</h2>
+<ul>
+<li>访问登录页并建立 PHP session：HTTP 200</li>
+<li>OCR 识别 4 位数字验证码，并在同一 session 中复用</li>
+<li>使用平台字典 password2.txt 尝试 186 次，命中用户 administrator</li>
+<li>命中的密码已用于验证，但最终学生指引中会按占位处理</li>
+<li>flag 已写入 <code>work/solve/11/flag.txt</code></li>
+</ul>
+  <h2>常见误区</h2>
+  <ul>
+    <li>只复制参考答案，不先确认当前实例的接口和响应是否一致。</li>
+    <li>忽略编码、Cookie、一次性 token、bot 轮询时间等执行条件。</li>
+    <li>看到一次失败就换题型，而不是先记录响应并缩小假设。</li>
+  </ul>
+  <h2>修复建议</h2>
+  <p>按题型回到根因修复：输入白名单、服务端鉴权、CSRF token、避免 shell 拼接、关闭危险 PHP wrapper、限制文件读取范围、使用强密钥和安全会话设计。</p>
+  <h2>总结</h2>
+  <p>本题应按“基线请求 -> 异常行为观察 -> 推断规则 -> 验证假设 -> 参考材料确认”的顺序完成。最终结果只作为验证闭环，不应替代前面的推理过程。</p>
+</article>
+</main>
+</body>
+</html>
