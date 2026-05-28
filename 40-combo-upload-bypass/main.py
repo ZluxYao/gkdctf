@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 # 40-combo-upload-bypass
 # 利用链: 黑名单不全(.htaccess漏网) + MIME仅看Content-Type + Apache AllowOverride + mod_php
 # 步骤: 传 .htaccess (让 .jpg 当 PHP 解析) -> 传带 PHP 代码的图片马 -> 访问触发 RCE -> 读 /flag

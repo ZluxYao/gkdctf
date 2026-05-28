@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """Q31 - IDOR 垂直越权 (BFLA) 自动化解题脚本
 利用点: /admin 检查了 role, 但 /admin/secret 漏检 role，仅检查登录态。
 """

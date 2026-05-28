@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q35 - 逻辑漏洞 · JWT 算法降级 (alg=none)
 目标: http://47.120.76.57:34947
@@ -12,7 +14,7 @@ import sys
 import urllib.request
 import urllib.parse
 
-TARGET = "http://47.120.76.57:34947"
+TARGET = "http://47.120.76.57:35026"
 
 
 def b64url(obj: dict) -> str:

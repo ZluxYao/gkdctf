@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q37 · 综合 SSRF 黑名单绕过
 目标: http://47.120.76.57:34963

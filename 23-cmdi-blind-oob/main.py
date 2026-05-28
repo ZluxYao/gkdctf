@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 import re
 import time
 import urllib.parse

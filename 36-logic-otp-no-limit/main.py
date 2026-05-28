@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 # 36-logic-otp-no-limit  —  OTP 暴力枚举（无速率限制 / 无锁定）
 # 漏洞：6 位数字 OTP（10^6 空间）+ /verify 无失败计数 / 无 IP 限速 / 无 OTP 过期
 #

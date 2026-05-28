@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q38 - 综合 · Jinja2 SSTI 一键拿 flag
 靶机: http://47.120.76.57:34964/greet?name=<payload>

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 30-idor-order-horizontal  -  IDOR 水平越权一键拿 flag
 靶机: http://47.120.76.57:34938

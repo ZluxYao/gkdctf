@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 25-path-encode-bypass
 利用双重 URL 编码绕过路径穿越过滤，读取 /var/secrets/flag.txt

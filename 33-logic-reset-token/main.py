@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 # 33-logic-reset-token: 重置 token 在响应中泄露 -> 劫持 admin
 import re, sys, requests
 

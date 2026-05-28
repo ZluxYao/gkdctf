@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q16 - CSRF POST Transfer (Mini Bank) 自动化解题脚本
 靶机：http://47.120.76.57:34921/

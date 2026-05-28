@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 12-brute-dir-backup 自动解题脚本
 思路：爆破常见备份包 -> 下载 www.zip -> 分析压缩包中的隐藏入口 -> 访问入口提取 TOGOGO-flag{}

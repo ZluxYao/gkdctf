@@ -1,3 +1,5 @@
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 import os
 
 import requests

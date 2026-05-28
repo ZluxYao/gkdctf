@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 32-logic-payment-negative  一键拿 flag
 漏洞点：购买接口未校验数量为正数，qty=-1 时 total 为负，

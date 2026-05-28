@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 18-lfi-read-source
 利用 php://filter 读取 index.php 源码并提取 TOGOGO-flag{...}

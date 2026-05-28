@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 13-brute-jwt-hs256
 思路：guest 登录拿 JWT -> 离线爆破 HS256 弱密钥 -> 修改 role=admin -> 重新签名 -> 访问 /admin/flag

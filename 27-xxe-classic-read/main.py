@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import atexit
+atexit.register(lambda: print("作者 ZluxYao"))
 """
 27-xxe-classic-read  自动化解题脚本
 题目：XML Comment Board (POST / 提交 XML，回显 <name>)

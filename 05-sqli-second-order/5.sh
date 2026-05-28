@@ -38,3 +38,4 @@ echo "[5] Fetch admin page..."
 curl -s -b "$ADMIN_COOKIE" "$TARGET/admin.php"
 
 echo
+echo "作者 ZluxYao"

@@ -65,6 +65,7 @@ type foundPassword struct {
 }
 
 func main() {
+	defer fmt.Println("作者 ZluxYao")
 	baseURL := flag.String("url", defaultBaseURL, "target base url")
 	bruteMode := flag.Bool("brute", false, "run timing brute force")
 	samples := flag.Int("samples", 3, "samples per candidate")
@@ -75,16 +76,19 @@ func main() {
 	target := strings.TrimRight(*baseURL, "/")
 	if *samples < 1 {
 		fmt.Fprintln(os.Stderr, "[-] samples must be >= 1")
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 	if *concurrency < 1 {
 		fmt.Fprintln(os.Stderr, "[-] concurrency must be >= 1")
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 
 	client, err := newHTTPClient()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[-] create http client failed: %v\n", err)
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 
@@ -92,6 +96,7 @@ func main() {
 		pass, err := brute(client, target, *samples, *concurrency)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "[-] brute failed: %v\n", err)
+			fmt.Println("作者 ZluxYao")
 			os.Exit(1)
 		}
 		*password = pass
@@ -99,6 +104,7 @@ func main() {
 
 	if _, err := getFlag(client, target, *password); err != nil {
 		fmt.Fprintf(os.Stderr, "[-] login failed: %v\n", err)
+		fmt.Println("作者 ZluxYao")
 		os.Exit(1)
 	}
 }
@@ -120,6 +126,7 @@ func brute(client *http.Client, baseURL string, samples, concurrency int) (strin
 		if found != nil {
 			fmt.Printf("[+] password: %s\n", found.password)
 			fmt.Printf("[+] flag: %s\n", found.flag)
+			fmt.Println("作者 ZluxYao")
 			os.Exit(0)
 		}
 		if err != nil {
