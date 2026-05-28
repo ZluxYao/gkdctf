@@ -26,7 +26,7 @@ from PIL import Image
 
 os.environ["NO_PROXY"] = "*"
 
-DEFAULT_URL = "http://47.120.47.61:33086/"
+DEFAULT_URL = "http://47.120.47.61:33240/"
 DEFAULT_USERS = [
     "admin",
     "administrator",

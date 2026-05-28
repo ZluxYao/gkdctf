@@ -20,7 +20,7 @@ import requests
 
 os.environ["NO_PROXY"] = "*"
 
-DEFAULT_URL = "http://47.120.76.57:34471/"
+DEFAULT_URL = "http://47.120.47.61:33319/"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")
 TOKEN_NAME = "SEARCH_TOKEN"
 

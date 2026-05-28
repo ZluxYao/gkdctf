@@ -18,7 +18,7 @@ from typing import Iterable, Optional, Tuple
 import requests
 
 os.environ["NO_PROXY"] = "*"
-DEFAULT_URL = "http://47.120.47.61:32987/"
+DEFAULT_URL = "http://47.120.47.61:33239/"
 DEFAULT_USERS = ["admin", "root", "test", "user", "ctf", "guest"]
 FAIL_MARK = "用户名或密码错误"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")

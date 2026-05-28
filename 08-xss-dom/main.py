@@ -18,7 +18,7 @@ from urllib.parse import unquote, quote
 import requests
 
 
-TARGET = "http://47.120.61.230:33170/"
+TARGET = "http://47.120.47.61:33330/"
 
 
 def get_flag(target: str) -> str | None:

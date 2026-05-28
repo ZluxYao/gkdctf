@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
-BASE_URL = "http://47.120.76.57:33857/"
+BASE_URL = "http://47.120.47.61:33267/"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")
 
 BACKUP_CANDIDATES = [
