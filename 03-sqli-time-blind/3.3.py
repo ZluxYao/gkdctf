@@ -24,7 +24,7 @@ import requests
 
 os.environ["NO_PROXY"] = "*"
 
-DEFAULT_URL = "http://47.120.76.57:34601/"
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34601/")
 PARAM = "kw"
 
 DEFAULT_SLEEP = 2.0

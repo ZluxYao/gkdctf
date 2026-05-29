@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """Q31 - IDOR 垂直越权 (BFLA) 自动化解题脚本
 利用点: /admin 检查了 role, 但 /admin/secret 漏检 role，仅检查登录态。
@@ -8,7 +9,7 @@ import re
 import sys
 import requests
 
-BASE = "http://47.120.76.57:34939"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34939")
 USER, PASS = "user", "user123"
 
 # 常见 admin 子路径词表（命中率排序）

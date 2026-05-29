@@ -11,7 +11,7 @@
 访问：
 
 ```text
-http://47.120.76.57:34293/login
+http://目标地址/login
 ```
 
 账号密码：
@@ -105,19 +105,19 @@ TOGOGO-flag{...}
 ```bash
 cd /Users/zlux/Project/Active/gkdctf/16-csrf-post-transfer
 source /Users/zlux/Project/Active/gkdctf/.venv/bin/activate
-python3 main.py --base http://47.120.76.57:34293 --wait 180
+python3 main.py --base http://目标地址 --wait 180
 ```
 
 如果不想让脚本先做 student->student 自检：
 
 ```bash
-python3 main.py --base http://47.120.76.57:34293 --wait 180 --no-self-check
+python3 main.py --base http://目标地址 --wait 180 --no-self-check
 ```
 
 ## 常见坑
 
 1. `/pages/submit` 只接受真实生成的相对路径 `/pages/<12位hex>`。
-2. 不要提交 `http://47.120.76.57:34293/pages/xxx`，也不要提交 `http://127.0.0.1:34293/pages/xxx`。
+2. 不要提交 `http://目标地址/pages/xxx`，也不要提交 `http://127.0.0.1:34293/pages/xxx`。
 3. payload 里的 `action` 用 `/transfer`，不要写外网完整地址，因为 bot 在本机同源环境访问。
 4. 自己 student->student 转账不会消耗 flag；题目说的是只有 admin->用户的第一笔会附带 flag。
 5. 如果脚本显示直连转账成功、bot 提交成功，但一直没有 `admin_msg`，一般是 bot 没跑或实例状态异常，重开实例后马上跑脚本。

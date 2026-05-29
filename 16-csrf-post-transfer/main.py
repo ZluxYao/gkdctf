@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q16 - CSRF POST Transfer (Mini Bank) 自动化解题脚本
-靶机：http://47.120.76.57:34921/
+靶机：http://127.0.0.1:34921/
 
 利用链：
   1. 普通账号 student / student 登录
@@ -19,7 +20,7 @@ import re
 import time
 import requests
 
-BASE = "http://47.120.76.57:34929"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34929")
 USER = "student"
 PASS = "student"
 

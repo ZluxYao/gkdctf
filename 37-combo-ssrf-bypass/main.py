@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q37 · 综合 SSRF 黑名单绕过
-目标: http://47.120.76.57:34963
+目标: http://127.0.0.1:34963
 思路: /fetch?url= 的 host 黑名单是字符串精确匹配 {127.0.0.1,localhost,0.0.0.0,::1}
       只要写一个解析后仍指向本地、但字面不在名单里的 host 即可绕过。
 用法: python3 main.py [BASE_URL]
@@ -13,7 +14,7 @@ import sys
 import re
 import requests
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://47.120.76.57:34963"
+BASE = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34963")
 TARGET_PATH = "/internal/flag"
 
 # 等价于 127.0.0.1 的常见绕过变体

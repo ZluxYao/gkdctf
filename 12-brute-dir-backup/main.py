@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 12-brute-dir-backup 自动解题脚本
@@ -15,7 +16,7 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
-BASE_URL = "http://47.120.47.61:33267/"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33267/")
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")
 
 BACKUP_CANDIDATES = [

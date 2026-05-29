@@ -25,7 +25,7 @@ import requests
 
 os.environ["NO_PROXY"] = "*"
 
-DEFAULT_URL = "http://47.120.47.61:32994/"
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33495/")
 DEFAULT_OLD_PASS = "oldpass123"
 DEFAULT_NEW_PASS = "NewPass123456"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")

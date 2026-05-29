@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 13-brute-jwt-hs256
@@ -17,7 +18,7 @@ from typing import Iterable, Optional
 
 import requests
 
-BASE_URL = "http://47.120.76.57:33858"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33858")
 LOGIN_URL = BASE_URL + "/api/login"
 FLAG_URL = BASE_URL + "/admin/flag"
 

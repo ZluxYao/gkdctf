@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 
 import re
@@ -10,7 +11,7 @@ import requests
 
 
 # Change this URL when the challenge instance changes.
-TARGET_URL = 'http://47.120.61.230:33343'
+TARGET_URL = os.environ.get("GKD_URL") or ('http://127.0.0.1:33343')
 
 
 def get_flag(base_url: str) -> str:

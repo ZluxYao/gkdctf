@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 19-lfi-log-poisoning
@@ -8,7 +9,7 @@ LFI + Apache access.log poisoning get flag.
 
 Usage:
   python3 main.py
-  python3 main.py http://47.120.76.57:34100/
+  python3 main.py http://127.0.0.1:34100/
 """
 
 import re
@@ -17,7 +18,7 @@ import time
 import requests
 from urllib.parse import urljoin
 
-TARGET = sys.argv[1].rstrip('/') + '/' if len(sys.argv) > 1 else 'http://47.120.76.57:34100/'
+TARGET = os.environ.get("GKD_URL") or (sys.argv[1].rstrip('/') + '/' if len(sys.argv) > 1 else 'http://127.0.0.1:34100/')
 FLAG_RE = re.compile(r'TOGOGO-flag\{[^}]+\}')
 
 

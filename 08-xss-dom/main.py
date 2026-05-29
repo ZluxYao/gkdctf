@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 08-xss-dom solve script
@@ -20,7 +21,7 @@ from urllib.parse import unquote, quote
 import requests
 
 
-TARGET = "http://47.120.47.61:33330/"
+TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:33330/")
 
 
 def get_flag(target: str) -> str | None:

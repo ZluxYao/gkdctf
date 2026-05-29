@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 import re
 import time
 import urllib.parse
 import requests
 
-BASE = "http://47.120.61.230:33446"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:33446")
 
 
 def trigger():

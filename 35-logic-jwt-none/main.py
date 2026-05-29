@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q35 - 逻辑漏洞 · JWT 算法降级 (alg=none)
-目标: http://47.120.76.57:34947
+目标: http://127.0.0.1:34947
 原理: 服务端 decode_token 信任 header 自声明的 alg；当 alg=none 时走
       jwt.decode(token, options={'verify_signature': False}) 分支，
       完全跳过签名校验。攻击者可任意伪造 payload。
@@ -14,7 +15,7 @@ import sys
 import urllib.request
 import urllib.parse
 
-TARGET = "http://47.120.76.57:35026"
+TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:35026")
 
 
 def b64url(obj: dict) -> str:

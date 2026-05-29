@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 17-csrf-xss-combo exploit script
@@ -18,7 +19,7 @@ import re
 import time
 import requests
 
-BASE_URL = "http://47.120.76.57:34097"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34097")
 USERNAME = "student"
 PASSWORD = "student"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")

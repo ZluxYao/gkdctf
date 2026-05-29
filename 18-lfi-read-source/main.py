@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 18-lfi-read-source
@@ -14,7 +15,7 @@ from html import unescape
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-BASE_URL = "http://47.120.76.57:34099/"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34099/")
 PAYLOAD = "php://filter/convert.base64-encode/resource=index"
 
 

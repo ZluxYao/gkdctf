@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 32-logic-payment-negative  一键拿 flag
@@ -11,7 +12,7 @@ import re
 import sys
 import requests
 
-BASE = "http://47.120.76.57:34940"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34940")
 
 
 def exploit(base: str = BASE) -> str:

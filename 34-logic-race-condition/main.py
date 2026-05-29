@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 # 34-logic-race-condition  TOCTOU 竞态利用
 # 思路：/redeem 中 read -> check -> sleep(0.15) -> read -> write 非原子。
@@ -23,7 +24,7 @@ def classify(x):
     if "500" in x or "Internal Server Error" in x: return "500"
     return "other"
 
-BASE = "http://47.120.76.57:35023"
+BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:35023")
 N    = 50          # 并发线程数；过低累加不够，过高 worker 易丢响应
 CODE = "GIFT10"
 

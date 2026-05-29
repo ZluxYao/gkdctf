@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 29-xxe-xinclude  自动化解题脚本
 ================================
-目标: http://47.120.76.57:34937/
+目标: http://127.0.0.1:34937/
 姿势: 利用 XInclude 绕过 DOCTYPE 黑名单, 通过 <xi:include> 直接读取本地文件
 Flag: TOGOGO-flag{...}
 """
@@ -18,7 +19,7 @@ import requests
 # ---------------------------------------------------------------------------
 # 默认目标 (可用 --url 覆盖)
 # ---------------------------------------------------------------------------
-DEFAULT_URL = "http://47.120.76.57:34937/"
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34937/")
 
 # XInclude payload 模板
 # - 不使用 <!DOCTYPE> -> 绕过服务端 "DOCTYPE is not allowed." 黑名单

