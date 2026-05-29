@@ -33,7 +33,7 @@ from PIL import Image
 
 os.environ["NO_PROXY"] = "*"
 
-DEFAULT_URL = os.environ.get("GKD_URL") or ("http://47.120.76.57:35279/")
+DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:35280/")
 DEFAULT_USERS = [
     "admin",
     "administrator",
