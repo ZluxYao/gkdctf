@@ -52,12 +52,7 @@ curl "http://目标地址/fetch?url=http://127.1/internal/flag"
 
 任选一个套进 `/fetch?url=http://<HOST>/internal/flag` 即可。
 
-## 4. 一键脚本
 
-```bash
-python3 main.py                              # 默认打 目标地址
-python3 main.py http://other-host:port       # 换靶机
-```
 
 输出会逐个尝试上面的 payload，并把第一个抓到的 flag 打印出来。
 
