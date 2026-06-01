@@ -5,6 +5,8 @@ atexit.register(lambda: print("作者 ZluxYao"))
 # 33-logic-reset-token: 重置 token 在响应中泄露 -> 劫持 admin
 import re, sys, requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34941")
 VICTIM = "admin"
 NEW_PWD = "pwned123"

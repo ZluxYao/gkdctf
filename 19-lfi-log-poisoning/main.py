@@ -16,6 +16,8 @@ import re
 import sys
 import time
 import requests
+
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
 from urllib.parse import urljoin
 
 TARGET = os.environ.get("GKD_URL") or (sys.argv[1].rstrip('/') + '/' if len(sys.argv) > 1 else 'http://127.0.0.1:34100/')

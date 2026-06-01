@@ -14,6 +14,8 @@ import sys
 import re
 import requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE = os.environ.get("GKD_URL") or (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:34963")
 TARGET_PATH = "/internal/flag"
 

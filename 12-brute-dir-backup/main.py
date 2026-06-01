@@ -16,6 +16,8 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33267/")
 FLAG_RE = re.compile(r"TOGOGO-flag\{[^}]+\}")
 

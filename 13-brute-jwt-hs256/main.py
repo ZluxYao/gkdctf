@@ -18,6 +18,8 @@ from typing import Iterable, Optional
 
 import requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:33858")
 LOGIN_URL = BASE_URL + "/api/login"
 FLAG_URL = BASE_URL + "/admin/flag"

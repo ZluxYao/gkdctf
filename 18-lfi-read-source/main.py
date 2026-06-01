@@ -15,6 +15,8 @@ from html import unescape
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 BASE_URL = os.environ.get("GKD_URL") or ("http://127.0.0.1:34099/")
 PAYLOAD = "php://filter/convert.base64-encode/resource=index"
 

